@@ -1,0 +1,25 @@
+{
+    "name": "BubbleRush.Game",
+    "rootNamespace": "",
+    "references": [
+        "GUID:0595321fbb39e914aa5744bbee972aa7",
+        "GUID:caca889fed6088d40b22c2d7e2909c31",
+        "GUID:18e5109d897e1b244ab2dfeaf5482c7b",
+        "GUID:324caed91501a9c47a04ebfd87b68794",
+        "GUID:560b04d1a97f54a4e82edc0cbbb69285",
+        "GUID:f51ebe6a0ceec4240a699833d6309b23",
+        "GUID:b0214a6008ed146ff8f122a6a9c2f6cc",
+        "GUID:c71612acbe346a344abbc0dcfdf4f0bd",
+        "GUID:6055be8ebefd69e48b49212b09b47b2f",
+        "GUID:a3eac051004cc4c6b92cb1b018e08311"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}
