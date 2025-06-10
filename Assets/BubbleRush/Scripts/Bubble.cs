@@ -9,21 +9,27 @@ namespace BubbleRush.Scripts
         [SerializeField] private SpriteRenderer spriteRenderer;
         [SerializeField] private Sprite[] sprites;
 
+        public Vector2Int PositionInGrid { get; private set; }
         public int Color { get; private set; }
         public Action<Collision2D, Bubble> CollisionEnter2D;
-
         private Vector2 _linearVelocity;
+
         public void SetColorIndex(int bubbleColor)
         {
             Color = bubbleColor;
             spriteRenderer.sprite = sprites[bubbleColor];
         }
 
+        public void SetPositionInGrid(Vector2Int gridPosition)
+        {
+            PositionInGrid = gridPosition;
+        }
+
         public void SetStatic()
         {
             body.bodyType = RigidbodyType2D.Static;
         }
-        
+
         public void SetDynamic()
         {
             body.bodyType = RigidbodyType2D.Dynamic;
@@ -31,22 +37,29 @@ namespace BubbleRush.Scripts
 
         public void SetLinearVelocity(Vector2 linearVelocity)
         {
-           // _linearVelocity = linearVelocity;
-           
-           body.linearVelocity = linearVelocity;
-        }
-
-        private void FixedUpdate()
-        {
-            if(body.bodyType == RigidbodyType2D.Static)
-                return;
-            
-            //body.linearVelocity = _linearVelocity;
+            body.linearVelocity = linearVelocity;
         }
 
         private void OnCollisionEnter2D(Collision2D other)
         {
-            CollisionEnter2D?.Invoke(other , this);
+            CollisionEnter2D?.Invoke(other, this);
         }
+
+#if UNITY_EDITOR
+        void OnDrawGizmosSelected()
+        {
+            UnityEditor.Handles.Label(
+                transform.position - new Vector3(0.25f, 0, 0), $"{PositionInGrid.x}, {PositionInGrid.y}",
+                new GUIStyle
+                {
+                    normal = new GUIStyleState()
+                    {
+                        textColor = UnityEngine.Color.black
+                    },
+                    fontSize = 15
+                }
+            );
+        }
+#endif
     }
 }

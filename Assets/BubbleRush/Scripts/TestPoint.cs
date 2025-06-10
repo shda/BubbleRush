@@ -13,6 +13,8 @@ namespace BubbleRush.Scripts
         public Vector2 offsetToBubbles = new(1,1);
         private void Update()
         {
+           // var mousePosition = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+          //  transform.position = mousePosition;
             var pos = transform.localPosition;
 
             float x = (float)(Math.Round(pos.x / offsetToBubbles.x) * offsetToBubbles.x);
@@ -32,7 +34,7 @@ namespace BubbleRush.Scripts
             {
                 var oldColor = Gizmos.color;
                 Gizmos.color = color;
-                Gizmos.DrawSphere(_position, sizePoint);
+                Gizmos.DrawSphere(transform.position, sizePoint);
                 Gizmos.color = oldColor;
             }
         }

@@ -8,7 +8,7 @@ namespace BubbleRush.Scripts
     {
         [SerializeField] private LuaScriptLoader luaScriptLoader;
         [SerializeField] private Cannon cannon;
-        [SerializeField] private BubblesField field;
+        [SerializeField] private FieldBubbles field;
         private void Start()
         {
             cannon.OnCollisionEnter2D = CollisionEnter2D;
@@ -29,10 +29,11 @@ namespace BubbleRush.Scripts
             {
                 projectile.SetStatic();
                 projectile.CollisionEnter2D = null;
-
-                await field.CheckAndRemoveFullLinesAsync(projectile);
                 
-                field.AddBubbleToField(projectile);
+                await UniTask.Yield();
+                field.PlaceBubbleInField(projectile);
+                
+                await field.CheckAndRemoveFullLinesAsync(projectile);
                 cannon.CreateNextBubble();
             }
         }
