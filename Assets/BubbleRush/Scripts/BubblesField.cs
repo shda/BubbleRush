@@ -1,6 +1,12 @@
+using System;
 using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 using BlockBlast.Scripts.Common;
+using Cysharp.Threading.Tasks;
+using DG.Tweening;
 using UnityEngine;
+using UnityEngine.Pool;
 
 namespace BubbleRush.Scripts
 {
@@ -8,9 +14,9 @@ namespace BubbleRush.Scripts
     {
         [SerializeField] private Vector2 offsetToBubbles = new(1,1);
         [SerializeField] private float offsetLine = 0.5f;
-        [SerializeField] private PoolGameObjectsComponent<Bubble> poolBubbles;
+        [SerializeField] private BubblesPool poolBubbles;
         
-        private readonly List<Bubble> _bubbles = new();
+        private readonly HashSet<Bubble> _bubbles = new();
         private int _lineCurrent = 0;
         
         public void CreateField(IEnumerable<int> bubblesColors)
@@ -49,6 +55,65 @@ namespace BubbleRush.Scripts
                 poolBubbles.Release(bubble);
             }
             _bubbles.Clear();
+        }
+
+        public void AddBubbleToField(Bubble bubble)
+        {
+            bubble.transform.SetParent(transform);
+            
+            var pos = bubble.transform.localPosition;
+
+            var x = (float)(Math.Round(pos.x / offsetToBubbles.x) * offsetToBubbles.x);
+            var y = (float)(Math.Round(pos.y / offsetToBubbles.y) * offsetToBubbles.y);
+            if ( Math.Round(pos.y / offsetToBubbles.y) % 2 != 0)
+            {
+                x += offsetToBubbles.x * 0.5f;
+            }
+
+            bubble.transform.localPosition = new Vector3(x, y, pos.z);
+        }
+
+        public async UniTask CheckAndRemoveFullLinesAsync(Bubble projectile)
+        {
+            _bubbles.Add(projectile);
+            
+            var currentBubble = projectile;
+            var color = projectile.Color;
+            
+            HashSet<Bubble> queue = new(){ projectile };
+            HashSet<Bubble> allBubble = new() ;
+
+            while (queue.Count > 0)
+            {
+                var first = queue.First();
+                queue.Remove(first);
+                
+                var findObjects = Physics2D.OverlapCircleAll(first.transform.position, offsetToBubbles.x);
+                foreach (var findObject in findObjects)
+                {
+                    var bubble = findObject.GetComponent<Bubble>();
+                    if(!bubble)
+                        continue;
+                    if(allBubble.Contains(bubble))
+                        continue;
+
+                    if (bubble.Color == color)
+                    {
+                        queue.Add(bubble);
+                        allBubble.Add(bubble);
+                    }
+                }
+            }
+
+            if (allBubble.Count >= 3)
+            {
+                foreach (var bubble in allBubble)
+                {
+                    await bubble.transform.DOScale(0, 0.1f);
+                    bubble.transform.localScale = Vector3.one;
+                    poolBubbles.Release(bubble);
+                }
+            }
         }
     }
 }

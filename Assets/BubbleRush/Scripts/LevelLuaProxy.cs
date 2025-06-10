@@ -17,8 +17,8 @@ namespace BubbleRush.Scripts
             bubblesField.ClearField();
             foreach (var str in stringsMap)
             {
-                var values = str.Value.ToString().Split(",");
-                bubblesField.CreateField(values.Select(int.Parse));
+                var values = str.Value.ToString();
+                bubblesField.CreateField(values.Select(c => int.Parse(c.ToString())));
             }
         }
     }
