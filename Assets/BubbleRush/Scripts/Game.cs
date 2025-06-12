@@ -1,3 +1,4 @@
+using System;
 using BubbleRush.Scripts.Lua;
 using Cysharp.Threading.Tasks;
 using UnityEngine;
@@ -11,15 +12,34 @@ namespace BubbleRush.Scripts
         [SerializeField] private Cannon cannon;
         [SerializeField] private BubbleSpawner bubbleSpawner;
         [SerializeField] private Field field;
-      
-        
+        [SerializeField] private TriggerLineCrossedObjects triggerLineCrossedObjects;
+        [SerializeField] private InputController inputController;
+        [SerializeField] private int addLineAfterShots = 5;
+
+        private int _currentShot = 0;
+
+        private void Awake()
+        {
+            inputController.OnShot = () =>
+            {
+                _currentShot++;
+                cannon.Shot();
+            };
+
+            inputController.OnUpdateDiraection = vec =>
+            {
+                cannon.PointToTarget = Camera.main.ScreenToWorldPoint(vec);
+            };
+        }
+
         private void Start()
         {
             cannon.OnCollisionEnter2D = CollisionEnter2D;
             luaScriptLoader.StartLevel();
+            _currentShot = 0;
             
             bubbleSpawner.SetNextBubble(1);
-            SetAnimationNewBubble(2).Forget();
+            SetAnimationNewBubbledAsync(2).Forget();
         }
 
         private void CollisionEnter2D(Collision2D collision, Bubble projectile)
@@ -41,7 +61,7 @@ namespace BubbleRush.Scripts
                     
                     field.ReturnBubbleToPool(projectile);
                     
-                    await SetAnimationNewBubble(projectile.Color);
+                    await SetAnimationNewBubbledAsync(projectile.Color);
                     return;
                 }
             }
@@ -55,13 +75,36 @@ namespace BubbleRush.Scripts
                 await UniTask.Yield();
                 field.FindAndInsertBubbleToFreePoint(projectile);
                 await field.CheckAndRemoveFullLinesAsync(projectile);
-                await SetAnimationNewBubble(projectile.Color);
-                
-                return;
+                await AddNewLineIfNeed();
+                await SetAnimationNewBubbledAsync(projectile.Color);
+                await CheckToGameOverAsync();
             }
         }
 
-        private async UniTask SetAnimationNewBubble(int lastColor)
+        private async UniTask AddNewLineIfNeed()
+        {
+            _currentShot++;
+            if(_currentShot >= addLineAfterShots)
+            {
+                _currentShot = 0;
+                await field.AddNewLineAsync();
+            }
+            
+            await UniTask.Yield();
+        }
+
+        private async UniTask CheckToGameOverAsync()
+        {
+            var crossCount = triggerLineCrossedObjects.CheckOverlappingObjects2D();
+            if(crossCount.Length > 1)
+            {
+                // Game Over logic here
+                Debug.Log("Game Over! You crossed the end line.");
+                // Optionally, you can reset the game or show a game over screen.
+            }
+        }
+
+        private async UniTask SetAnimationNewBubbledAsync(int lastColor)
         {
             await UniTask.Yield();
             await cannon.AnimatedSetNextBubbleAsync(bubbleSpawner.CurrentBubble);

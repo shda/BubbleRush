@@ -14,14 +14,13 @@ namespace BubbleRush.Scripts.Lua
         [LuaMember]
         private void CreateMap(LuaTable stringsMap)
         {
-            /*
+            return;
             field.ClearField();
             foreach (var str in stringsMap)
             {
                 var values = str.Value.ToString();
                 field.CreateField(values.Select(c => int.Parse(c.ToString())));
             }
-            */
         }
     }
 }

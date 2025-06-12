@@ -11,12 +11,14 @@ namespace BubbleRush.Scripts
     {
         [SerializeField] private BubblesPool poolBubbles;
         
-        private readonly FindUnconnectedAreas findUnconnectedAreas = new();
-        public async UniTask CheckAndRemoveFullLinesAsync(HashSet<Bubble> _bubbles , Bubble projectile , Vector2 offsetToBubbles)
+        private readonly FindUnconnectedBubblesToRoot findUnconnectedAreas = new();
+        private readonly FindOneColorBubblesConnect findOneColorBubblesConnect = new();
+        public async UniTask CheckAndRemoveFullLinesAsync(HashSet<Bubble> bubbles , Bubble projectile , Vector2 offsetToBubbles)
         {
-            _bubbles.Add(projectile);
+            bubbles.Add(projectile);
             
             var color = projectile.Color;
+            /*
             HashSet<Bubble> queue = new() { projectile };
             HashSet<Bubble> allBubble = new();
 
@@ -41,6 +43,9 @@ namespace BubbleRush.Scripts
                     }
                 }
             }
+            */
+
+            var allBubble = findOneColorBubblesConnect.FindOneColorBubblesToOne(projectile);
 
             if (allBubble.Count >= 3)
             {
@@ -49,20 +54,18 @@ namespace BubbleRush.Scripts
                     await bubble.transform.DOScale(0, 0.03f);
                     bubble.transform.localScale = Vector3.one;
                     poolBubbles.Release(bubble);
-                    _bubbles.Remove(bubble);
+                    bubbles.Remove(bubble);
                 }
             }
-
-            await UniTask.DelayFrame(5);
-
-            var bubbles = findUnconnectedAreas.FindFreeBubbles(_bubbles);
+        }
+        
+        public async UniTask RemoveFreeBubblesAsync(HashSet<Bubble> allBubbles)
+        {
+            var bubbles = findUnconnectedAreas.FindUnconnectedBubbles(allBubbles);
             HashSet<Bubble> bubblesHash = new();
-            foreach (var bubbleList in bubbles)
+            foreach (var bubble in bubbles)
             {
-                foreach (var bubble in bubbleList)
-                {
-                    bubblesHash.Add(bubble);
-                }
+                bubblesHash.Add(bubble);
             }
 
             foreach (var bubble in bubblesHash)
@@ -71,13 +74,15 @@ namespace BubbleRush.Scripts
                 bubble.transform.localScale = Vector3.one;
                 try
                 {
-                    _bubbles.Remove(bubble);
+                    allBubbles.Remove(bubble);
                     poolBubbles.Release(bubble);
                 }
                 catch (Exception e)
                 {
                     Debug.LogException(e);
                 }
+
+                bubble.RemoveNeighbors();
             }
         }
     }

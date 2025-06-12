@@ -8,14 +8,17 @@ namespace BubbleRush.Scripts
 {
     public class Cannon : MonoBehaviour
     {
-        [SerializeField] private BubblesPool poolBubbles;
-        [SerializeField] private Vector2 minMaxAngle;
         [SerializeField] private Transform rootRotate;
         [SerializeField] private Transform rootBubble;
+        [SerializeField] private BubblesPool poolBubbles;
         [SerializeField] private BubbleRay bubbleRay;
+        
+        [SerializeField] private Vector2 minMaxAngle;
         [SerializeField] private float speedBubbleMove = 1.0f;
         
         private Bubble _currentBubble;
+        
+        public Vector3 PointToTarget { get; set; }
         
         public Action<Collision2D , Bubble >  OnCollisionEnter2D;
 
@@ -40,7 +43,7 @@ namespace BubbleRush.Scripts
             OnCollisionEnter2D?.Invoke(collision , bubble);
         }
 
-        private void Shot()
+        public void Shot()
         {
             if(!_currentBubble)
                 return;
@@ -55,17 +58,12 @@ namespace BubbleRush.Scripts
         
         private void Update()
         {
-            if (Input.GetMouseButtonDown(0))
-            {
-                Shot();
-            }
- 
             RotateToPoint();
         }
 
         private void RotateToPoint()
         {
-            var mousePosition = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+            var mousePosition = PointToTarget;// Camera.main.ScreenToWorldPoint(Input.mousePosition);
             mousePosition.z = 0;
             
             Vector2 direction = mousePosition - rootRotate.position;

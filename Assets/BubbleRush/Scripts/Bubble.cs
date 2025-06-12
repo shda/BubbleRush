@@ -1,4 +1,6 @@
 using System;
+using System.Buffers;
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace BubbleRush.Scripts
@@ -22,6 +24,9 @@ namespace BubbleRush.Scripts
 
         public int Color { get; private set; }
         public Action<Collision2D, Bubble> CollisionEnter2D;
+        
+        public HashSet<Bubble> Neighbors { get; set; } = new ();
+        
         private Vector2 _linearVelocity;
         private Vector2 _offsetToBubbles;
 
@@ -59,12 +64,49 @@ namespace BubbleRush.Scripts
 
         public void UpdateWorldPositon()
         {
-            transform.localPosition =
-                new Vector3(PositionInGrid.x * _offsetToBubbles.x, PositionInGrid.y * -_offsetToBubbles.y);
-            if (PositionInGrid.y % 2 != 0)
+            transform.localPosition = GetMovingPoint(PositionInGrid);
+        }
+
+        public Vector3 GetMovingPoint(Vector2Int position)
+        {
+            var point = new Vector3(position.x * _offsetToBubbles.x, position.y * -_offsetToBubbles.y);
+            if (position.y % 2 != 0)
             {
-                transform.localPosition += new Vector3(_offsetToBubbles.x * 0.5f, 0, 0);
+                point += new Vector3(_offsetToBubbles.x * 0.5f, 0, 0);
             }
+
+            return point;
+        }
+        
+        public void RemoveNeighbors()
+        {
+            foreach (var neighbor in Neighbors)
+            {
+                neighbor.Neighbors.Remove(this);
+            }
+            Neighbors.Clear();
+        }
+
+        public void UpdateNeighbors()
+        {
+            Neighbors.Clear();
+            
+            var colliders = ArrayPool<Collider2D>.Shared.Rent(10);
+            var size = Physics2D.OverlapCircleNonAlloc(transform.position, _offsetToBubbles.x, colliders);
+            for (int i = 0; i < size; i++)
+            {
+                var coll = colliders[i];
+                if (coll != null && 
+                    coll.gameObject.activeInHierarchy &&
+                    coll.gameObject != gameObject && 
+                    coll.TryGetComponent<Bubble>(out var bubble))
+                {
+                    Neighbors.Add(bubble);
+                    bubble.Neighbors.Add(this);
+                } 
+            }
+            
+            ArrayPool<Collider2D>.Shared.Return(colliders);
         }
 
 #if UNITY_EDITOR
@@ -81,7 +123,13 @@ namespace BubbleRush.Scripts
                     fontSize = 15
                 }
             );
+
+            foreach (var neighbor in Neighbors)
+            {
+                Gizmos.DrawLine(transform.position, neighbor.transform.position);
+            }
         }
 #endif
+        
     }
 }

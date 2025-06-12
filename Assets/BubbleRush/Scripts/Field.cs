@@ -1,6 +1,8 @@
 using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using Cysharp.Threading.Tasks;
+using DG.Tweening;
 using TriInspector;
 using UnityEngine;
 using ZLinq;
@@ -20,6 +22,17 @@ namespace BubbleRush.Scripts
         private readonly HashSet<Bubble> _bubbles = new();
         private int _lineCurrent;
 
+        private async void Awake()
+        {
+            await UniTask.DelayFrame(5);
+            UpdateAllNeighbors();
+            
+            await UniTask.DelayFrame(5);
+            
+            FindUnconnectedBubblesToRoot findUnconnectedAreas = new();
+            var bubbles = findUnconnectedAreas.FindUnconnectedBubbles(_bubbles);
+        }
+
         public int GetRandomColorIndex()
         {
             return Random.Range(0, maxColorIndex);
@@ -27,6 +40,7 @@ namespace BubbleRush.Scripts
         
         private async void Start()
         {
+          //  return;
             await UniTask.DelayFrame(5);
             
             var field = fieldGenerator.GenerateField(6,6, 5);
@@ -41,40 +55,74 @@ namespace BubbleRush.Scripts
                     _bubbles.Add(bubble);
                 }
             }
+
+            await UniTask.DelayFrame(5);
+            UpdateAllNeighbors();
         }
 
         [Button]
-        public void AddNewLine()
+        public void FindAllUnconnectedBubbles()
+        {
+            FindUnconnectedBubblesToRoot findUnconnectedAreas = new();
+            var bubbles = findUnconnectedAreas.FindUnconnectedBubbles(_bubbles);
+        }
+
+        [Button]
+        public void UpdateAllNeighbors()
+        {
+            foreach (var bubble in _bubbles)
+            {
+                bubble.UpdateNeighbors();
+            }
+        }
+        
+        [Button]
+        public async UniTask AddNewLineAsync()
         {
             var newLine = fieldGenerator.CreateNewLine(maxColorIndex);
             foreach (var bubble in _bubbles)
             {
-                bubble.PositionInGrid += new Vector2Int(0, 1);
+                var newPos = bubble.PositionInGrid + new Vector2Int(0, 1);
+                var pointMove = bubble.GetMovingPoint(newPos);
+                bubble.transform.DOLocalMove(pointMove, 0.5f).onComplete = () =>
+                {
+                    bubble.PositionInGrid = newPos;
+                };
             }
+            
+            await UniTask.Delay(TimeSpan.FromSeconds(0.5f));
 
             for (var i = 0; i < newLine.Length; i++)
             {
                 var bubbleColor = newLine[i];
                 var newBubble = poolBubbles.Get();
-                SetBubbleInfo(newBubble , i , 0 , bubbleColor);
                 _bubbles.Add(newBubble);
+                
+                newBubble.transform.localScale = Vector3.zero;
+                newBubble.transform.DOScale(Vector3.one, 0.2f);
+                
+                SetBubbleInfo(newBubble , i , 0 , bubbleColor);
             }
+
+            await UniTask.Delay(TimeSpan.FromSeconds(0.5f));
         }
         
         public void CreateField(IEnumerable<int> bubblesColors)
         {
             float x = 0;
+            int coordX = 0;
             foreach (var bubbleColor in bubblesColors)
             {
                 if (bubbleColor > 0)
                 {
                     var bubble = poolBubbles.Get();
                     bubble.SetOffset(offsetToBubbles);
-                    SetBubbleInfo(bubble , (int)x, _lineCurrent, bubbleColor);
+                    SetBubbleInfo(bubble , coordX, _lineCurrent, bubbleColor - 1);
                     _bubbles.Add(bubble);
                 }
 
                 x += offsetToBubbles.x;
+                coordX++;
             }
 
             _lineCurrent++;
@@ -87,6 +135,20 @@ namespace BubbleRush.Scripts
             bubble.SetStatic();
             bubble.transform.SetParent(transform);
             bubble.PositionInGrid = new Vector2Int(x, y);
+        }
+
+        private void SetBubbleInfoAnimate(Bubble bubble, int x, int y, int colorIndex)
+        {
+            bubble.SetOffset(offsetToBubbles);
+            bubble.SetColorIndex(colorIndex);
+            bubble.SetStatic();
+            bubble.transform.SetParent(transform);
+
+            var pointMove = bubble.GetMovingPoint(new Vector2Int(x, y));
+            bubble.transform.DOLocalMove(pointMove, 0.5f).onComplete = () =>
+            {
+                bubble.PositionInGrid = new Vector2Int(x, y);
+            };
         }
 
         public void ClearField()
@@ -172,7 +234,17 @@ namespace BubbleRush.Scripts
 
         public async UniTask CheckAndRemoveFullLinesAsync(Bubble projectile)
         {
+            projectile.UpdateNeighbors();
             await animationRemoveBubbles.CheckAndRemoveFullLinesAsync(_bubbles, projectile, offsetToBubbles);
+            
+            await UniTask.DelayFrame(5);
+            UpdateAllNeighbors();
+            await animationRemoveBubbles.RemoveFreeBubblesAsync(_bubbles);
+        }
+
+        public bool CheckInBubblesCrossEndLevel()
+        {
+            return false;
         }
 
         public void ReturnBubbleToPool(Bubble projectile)
