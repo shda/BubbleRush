@@ -191,9 +191,22 @@ namespace BubbleRush.Scripts
             {
                 await bubble.transform.DOScale(0, 0.03f);
                 bubble.transform.localScale = Vector3.one;
-                poolBubbles.Release(bubble);
-                _bubbles.Remove(bubble);
+                try
+                {
+                    _bubbles.Remove(bubble);
+                    poolBubbles.Release(bubble);
+                }
+                catch (Exception e)
+                {
+                    Debug.LogException(e);
+                }
             }
+        }
+        
+        public void ReturnToPool(Bubble projectile)
+        {
+            poolBubbles.Release(projectile);
+            _bubbles.Remove(projectile);
         }
 
 #if UNITY_EDITOR
@@ -216,5 +229,6 @@ namespace BubbleRush.Scripts
             Gizmos.DrawSphere(point2, 0.3f);
         }
 #endif
+        
     }
 }

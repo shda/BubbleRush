@@ -9,7 +9,7 @@ namespace BubbleRush.Scripts
         [SerializeField] private SpriteRenderer spriteRenderer;
         [SerializeField] private Sprite[] sprites;
 
-        public Vector2Int PositionInGrid { get; private set; }
+        public Vector2Int PositionInGrid { get;set; }
         public int Color { get; private set; }
         public Action<Collision2D, Bubble> CollisionEnter2D;
         private Vector2 _linearVelocity;

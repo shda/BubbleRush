@@ -12,6 +12,7 @@ namespace BubbleRush.Scripts
         private int cols;
         private bool[,] visited;
 
+        
         public List<List<Bubble>> FindFreeBubbles(HashSet<Bubble> bubbles)
         {
             rows = bubbles.Max(b => b.PositionInGrid.x) + 1;

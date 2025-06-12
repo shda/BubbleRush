@@ -1,6 +1,7 @@
 using System;
+using Cysharp.Threading.Tasks;
+using DG.Tweening;
 using UnityEngine;
-using Random = UnityEngine.Random;
 
 namespace BubbleRush.Scripts
 {
@@ -10,6 +11,7 @@ namespace BubbleRush.Scripts
         [SerializeField] private Vector2 minMaxAngle;
         [SerializeField] private Transform rootRotate;
         [SerializeField] private Transform rootBubble;
+        [SerializeField] private BubbleRay bubbleRay;
         [SerializeField] private float speedBubbleMove = 1.0f;
         
         private Bubble _currentBubble;
@@ -18,29 +20,20 @@ namespace BubbleRush.Scripts
 
         private void Awake()
         {
-            CreateNextBubble();
+            bubbleRay.StopSimulate();
         }
 
-        public void CreateNextBubble()
+        public async UniTask AnimatedSetNextBubbleAsync(Bubble bubble)
         {
-            _currentBubble = PrepareBubble();
-        }
-
-        private Bubble PrepareBubble()
-        {
-            var bubble = poolBubbles.Get();
+            await UniTask.Yield();
             bubble.transform.SetParent(rootBubble);
-            bubble.transform.localPosition = Vector3.zero;
-            bubble.transform.localRotation = Quaternion.identity;
+            await bubble.transform.DOLocalMove(Vector3.zero, 0.5f);
+            _currentBubble = bubble;
             bubble.CollisionEnter2D = CollisionEnter2D;
             
-            bubble.SetStatic();
-            //bubble.SetColorIndex(0);
-            bubble.SetColorIndex(Random.Range(0, 4));
-
-            return bubble;
+            bubbleRay.StartSimulate();
         }
-
+        
         private void CollisionEnter2D(Collision2D collision, Bubble bubble)
         {
             OnCollisionEnter2D?.Invoke(collision , bubble);
@@ -51,12 +44,11 @@ namespace BubbleRush.Scripts
             if(!_currentBubble)
                 return;
             
-            var mousePosition = Camera.main.ScreenToWorldPoint(Input.mousePosition);
-            Vector2 direction = mousePosition - rootRotate.position;
+            bubbleRay.StopSimulate();
+            
             _currentBubble.transform.SetParent(null);
             _currentBubble.SetDynamic();
-            _currentBubble.SetLinearVelocity(direction.normalized * speedBubbleMove);
-
+            _currentBubble.SetLinearVelocity(rootRotate.right * speedBubbleMove);
             _currentBubble = null;
         }
         
@@ -66,7 +58,7 @@ namespace BubbleRush.Scripts
             {
                 Shot();
             }
-            
+ 
             RotateToPoint();
         }
 
@@ -82,6 +74,8 @@ namespace BubbleRush.Scripts
             if (minMaxAngle.x < angle && angle < minMaxAngle.y)
             {
                 rootRotate.rotation = Quaternion.AngleAxis(angle, Vector3.forward);
+                
+                bubbleRay.UpdateVelocity(direction.normalized * speedBubbleMove);
             }
         }
     }
