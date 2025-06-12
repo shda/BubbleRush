@@ -56,7 +56,7 @@ namespace BubbleRush.Scripts
             {
                 var bubbleColor = newLine[i];
                 var newBubble = poolBubbles.Get();
-                SetBubbleInfo(newBubble , i , -1 , bubbleColor);
+                SetBubbleInfo(newBubble , i , 0 , bubbleColor);
                 _bubbles.Add(newBubble);
             }
         }
