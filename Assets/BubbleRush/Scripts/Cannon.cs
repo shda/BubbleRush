@@ -1,4 +1,5 @@
 using System;
+using BubbleRush.Scripts.Bonuses;
 using Cysharp.Threading.Tasks;
 using DG.Tweening;
 using UnityEngine;
@@ -20,7 +21,7 @@ namespace BubbleRush.Scripts
 
         private void Awake()
         {
-            bubbleRay.StopSimulate();
+            bubbleRay.StopDrawLine();
         }
 
         public async UniTask AnimatedSetNextBubbleAsync(Bubble bubble)
@@ -31,7 +32,7 @@ namespace BubbleRush.Scripts
             _currentBubble = bubble;
             bubble.CollisionEnter2D = CollisionEnter2D;
             
-            bubbleRay.StartSimulate();
+            bubbleRay.StartDrawLine();
         }
         
         private void CollisionEnter2D(Collision2D collision, Bubble bubble)
@@ -44,7 +45,7 @@ namespace BubbleRush.Scripts
             if(!_currentBubble)
                 return;
             
-            bubbleRay.StopSimulate();
+            bubbleRay.StopDrawLine();
             
             _currentBubble.transform.SetParent(null);
             _currentBubble.SetDynamic();
@@ -75,7 +76,7 @@ namespace BubbleRush.Scripts
             {
                 rootRotate.rotation = Quaternion.AngleAxis(angle, Vector3.forward);
                 
-                bubbleRay.UpdateVelocity(direction.normalized * speedBubbleMove);
+                bubbleRay.SetVelocity(direction.normalized * speedBubbleMove);
             }
         }
     }

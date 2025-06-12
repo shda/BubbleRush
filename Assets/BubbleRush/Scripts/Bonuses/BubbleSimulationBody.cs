@@ -1,8 +1,8 @@
 using UnityEngine;
 
-namespace BubbleRush.Scripts
+namespace BubbleRush.Scripts.Bonuses
 {
-    public class SimulationBody : MonoBehaviour
+    public class BubbleSimulationBody : MonoBehaviour
     {
         [SerializeField] private Rigidbody2D rigidbody;
         public Rigidbody2D Rigidbody => rigidbody;

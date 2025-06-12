@@ -5,31 +5,31 @@ using UnityEngine;
 
 namespace BubbleRush.Scripts
 {
-    public class FieldLogic : MonoBehaviour
+    public class FindUnconnectedAreas
     {
         private Bubble[,] grid;
-        private int rows;
-        private int cols;
+        private int maxX;
+        private int maxY;
         private bool[,] visited;
 
         
         public List<List<Bubble>> FindFreeBubbles(HashSet<Bubble> bubbles)
         {
-            rows = bubbles.Max(b => b.PositionInGrid.x) + 1;
-            cols = bubbles.Max(b => b.PositionInGrid.y) + 1;
+            maxX = bubbles.Max(b => b.PositionInGrid.x) + 1;
+            maxY = bubbles.Max(b => b.PositionInGrid.y) + 1;
 
-            grid = new Bubble[rows, cols];
+            grid = new Bubble[maxX, maxY];
             foreach (var b in bubbles)
             {
                 grid[b.PositionInGrid.x, b.PositionInGrid.y] = b;
             }
 
-            visited = new bool[rows, cols];
+            visited = new bool[maxX, maxY];
 
             List<List<Bubble>> isolatedAreas = new();
-            for (int x = 0; x < rows; x++)
+            for (int x = 0; x < maxX; x++)
             {
-                for (int y = 0; y < cols; y++)
+                for (int y = 0; y < maxY; y++)
                 {
                     if (grid[x, y] && !visited[x, y])
                     {
@@ -50,7 +50,7 @@ namespace BubbleRush.Scripts
 
         private void ExploreArea(int x, int y, List<Bubble> area)
         {
-            if (x < 0 || x >= rows || y < 0 || y >= cols || grid[x, y] == null || visited[x, y])
+            if (x < 0 || x >= maxX || y < 0 || y >= maxY || grid[x, y] == null || visited[x, y])
                 return;
 
             visited[x, y] = true;
@@ -67,14 +67,6 @@ namespace BubbleRush.Scripts
            // ExploreArea(x - 1, y + 1, area);
             ExploreArea(x + 1, y - 1, area);
             ExploreArea(x + 1, y + 1, area);
-        }
-        
-        private bool IsIsolated(List<Tuple<int, int>> area)
-        {
-            // Проверяем, есть ли связь с другими областями
-            // В этой реализации все найденные области уже изолированы,
-            // так как алгоритм помечает все связанные клетки как посещенные
-            return true;
         }
     }
 }

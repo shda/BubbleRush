@@ -1,3 +1,4 @@
+using BubbleRush.Scripts.Lua;
 using Cysharp.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.Serialization;
@@ -9,8 +10,8 @@ namespace BubbleRush.Scripts
         [SerializeField] private LuaScriptLoader luaScriptLoader;
         [SerializeField] private Cannon cannon;
         [SerializeField] private BubbleSpawner bubbleSpawner;
-        [FormerlySerializedAs("field")] [SerializeField] private FieldBubbles fieldBubbles;
-        [SerializeField] private int maxColorIndex = 6;
+        [SerializeField] private Field field;
+      
         
         private void Start()
         {
@@ -38,7 +39,7 @@ namespace BubbleRush.Scripts
                     projectile.SetStatic();
                     projectile.CollisionEnter2D = null;
                     
-                    fieldBubbles.ReturnToPool(projectile);
+                    field.ReturnBubbleToPool(projectile);
                     
                     await SetAnimationNewBubble(projectile.Color);
                     return;
@@ -52,8 +53,8 @@ namespace BubbleRush.Scripts
                 projectile.CollisionEnter2D = null;
                 
                 await UniTask.Yield();
-                fieldBubbles.PlaceBubbleInField(projectile);
-                await fieldBubbles.CheckAndRemoveFullLinesAsync(projectile);
+                field.FindAndInsertBubbleToFreePoint(projectile);
+                await field.CheckAndRemoveFullLinesAsync(projectile);
                 await SetAnimationNewBubble(projectile.Color);
                 
                 return;
@@ -66,10 +67,10 @@ namespace BubbleRush.Scripts
             await cannon.AnimatedSetNextBubbleAsync(bubbleSpawner.CurrentBubble);
            // reflectingRay.SetBody(nextBubble.CurrentBubble);
             
-            var nextColorIndex = Random.Range(0, maxColorIndex);
+            var nextColorIndex = field.GetRandomColorIndex();
             while (nextColorIndex == lastColor)
             {
-                nextColorIndex = Random.Range(0, maxColorIndex);
+                nextColorIndex = field.GetRandomColorIndex();
             }
             bubbleSpawner.SetNextBubble(nextColorIndex);
         }

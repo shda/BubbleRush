@@ -12,7 +12,7 @@ namespace BubbleRush.Scripts
         {
             var bubble = bubblesPool.Get();
             bubble.SetColorIndex(colorIndex);
-            bubble.SetPositionInGrid(Vector2Int.zero);
+            bubble.PositionInGrid = Vector2Int.zero;
             bubble.transform.position = rootBubble.position;
             bubble.SetStatic();
 

@@ -131,7 +131,7 @@ GameObject:
   - component: {fileID: 62907770}
   - component: {fileID: 62907769}
   m_Layer: 0
-  m_Name: Background
+  m_Name: BackgroundImage
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -366,7 +366,7 @@ GameObject:
   m_Component:
   - component: {fileID: 328265194}
   m_Layer: 0
-  m_Name: Cannon
+  m_Name: Root
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -909,7 +909,7 @@ GameObject:
   - component: {fileID: 584800996}
   - component: {fileID: 584800998}
   m_Layer: 0
-  m_Name: DrawLineBonus
+  m_Name: BonusDrawLine
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1065,10 +1065,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e7c96b374ff641ac9fc101df587acb9b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  simulationBody: {fileID: 8942381659584179188}
+  bubbleSimulationBody: {fileID: 8942381659584179188}
   rootRotate: {fileID: 328265194}
   lineRenderer: {fileID: 584800996}
-  maxIterations: 40
+  maxIterations: 30
   simulationStep: 0.04
 --- !u!1 &590478343
 GameObject:
@@ -1269,10 +1269,10 @@ Transform:
   m_Children:
   - {fileID: 335721101}
   - {fileID: 2084171260}
-  - {fileID: 62907768}
   - {fileID: 459515823}
   - {fileID: 1743358498}
   - {fileID: 421863838}
+  - {fileID: 62907768}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &707980770
@@ -1289,7 +1289,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   luaAsset: {fileID: -6979533126094156877, guid: 4b489f2d96e557949b4e4ee6a56b2f76, type: 3}
   levelLuaProxy:
-    fieldBubbles: {fileID: 2084171261}
+    field: {fileID: 2084171261}
 --- !u!114 &707980771
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1305,8 +1305,8 @@ MonoBehaviour:
   luaScriptLoader: {fileID: 707980770}
   cannon: {fileID: 335721102}
   bubbleSpawner: {fileID: 1743358497}
-  fieldBubbles: {fileID: 2084171261}
-  maxColorIndex: 6
+  field: {fileID: 2084171261}
+  maxColorIndex: 5
 --- !u!114 &707980772
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1880,7 +1880,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1220068050}
   m_Layer: 0
-  m_Name: Root
+  m_Name: Offset
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -2069,7 +2069,7 @@ GameObject:
   - component: {fileID: 1743358498}
   - component: {fileID: 1743358497}
   m_Layer: 0
-  m_Name: NextBubble
+  m_Name: BubbleSpawner
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -2118,7 +2118,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1749520125}
   m_Layer: 0
-  m_Name: BubbleRoot
+  m_Name: BubblesRoot
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -2239,7 +2239,7 @@ GameObject:
   - component: {fileID: 2084171263}
   - component: {fileID: 2084171262}
   m_Layer: 0
-  m_Name: BubblesField
+  m_Name: Field
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -2275,7 +2275,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   offsetToBubbles: {x: 1.2, y: 1.2}
   poolBubbles: {fileID: 707980772}
-  fieldLogic: {fileID: 2084171263}
+  animationRemoveBubbles: {fileID: 2084171263}
   offset: 0.5
 --- !u!114 &2084171262
 MonoBehaviour:
@@ -2300,9 +2300,10 @@ MonoBehaviour:
   m_GameObject: {fileID: 2084171259}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 9e83782cb30c4a80a3ba118dc3eb9bc6, type: 3}
+  m_Script: {fileID: 11500000, guid: 0ffdb1ae09d04134a8bad2069e400d31, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  poolBubbles: {fileID: 707980772}
 --- !u!50 &2034517005393039784
 Rigidbody2D:
   serializedVersion: 5

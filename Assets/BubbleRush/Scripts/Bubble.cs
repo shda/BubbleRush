@@ -9,21 +9,28 @@ namespace BubbleRush.Scripts
         [SerializeField] private SpriteRenderer spriteRenderer;
         [SerializeField] private Sprite[] sprites;
 
-        public Vector2Int PositionInGrid { get;set; }
+        private Vector2Int _positionInGrid;
+        public Vector2Int PositionInGrid
+        {
+            get => _positionInGrid;
+            set
+            {
+                _positionInGrid = value;
+                UpdateWorldPositon();
+            }
+        }
+
         public int Color { get; private set; }
         public Action<Collision2D, Bubble> CollisionEnter2D;
         private Vector2 _linearVelocity;
+        private Vector2 _offsetToBubbles;
 
         public void SetColorIndex(int bubbleColor)
         {
             Color = bubbleColor;
             spriteRenderer.sprite = sprites[bubbleColor];
         }
-
-        public void SetPositionInGrid(Vector2Int gridPosition)
-        {
-            PositionInGrid = gridPosition;
-        }
+        
 
         public void SetStatic()
         {
@@ -43,6 +50,21 @@ namespace BubbleRush.Scripts
         private void OnCollisionEnter2D(Collision2D other)
         {
             CollisionEnter2D?.Invoke(other, this);
+        }
+
+        public void SetOffset(Vector2 offsetToBubbles)
+        {
+            _offsetToBubbles = offsetToBubbles;
+        }
+
+        public void UpdateWorldPositon()
+        {
+            transform.localPosition =
+                new Vector3(PositionInGrid.x * _offsetToBubbles.x, PositionInGrid.y * -_offsetToBubbles.y);
+            if (PositionInGrid.y % 2 != 0)
+            {
+                transform.localPosition += new Vector3(_offsetToBubbles.x * 0.5f, 0, 0);
+            }
         }
 
 #if UNITY_EDITOR

@@ -2,25 +2,26 @@ using System;
 using System.Linq;
 using Lua;
 using UnityEngine;
-using UnityEngine.Serialization;
 
-namespace BubbleRush.Scripts
+namespace BubbleRush.Scripts.Lua
 {
     [Serializable]
     [LuaObject]
     public partial class LevelLuaProxy
     {
-        [SerializeField] private FieldBubbles fieldBubbles;
+        [SerializeField] private Field field;
 
         [LuaMember]
         private void CreateMap(LuaTable stringsMap)
         {
-            fieldBubbles.ClearField();
+            /*
+            field.ClearField();
             foreach (var str in stringsMap)
             {
                 var values = str.Value.ToString();
-                fieldBubbles.CreateField(values.Select(c => int.Parse(c.ToString())));
+                field.CreateField(values.Select(c => int.Parse(c.ToString())));
             }
+            */
         }
     }
 }

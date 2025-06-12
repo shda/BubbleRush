@@ -6,7 +6,7 @@ using Lua.Unity;
 using TriInspector;
 using UnityEngine;
 
-namespace BubbleRush.Scripts
+namespace BubbleRush.Scripts.Lua
 {
     public class LuaScriptLoader : MonoBehaviour
     {
