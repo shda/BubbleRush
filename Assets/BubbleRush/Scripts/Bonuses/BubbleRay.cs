@@ -15,6 +15,11 @@ namespace BubbleRush.Scripts.Bonuses
         private Vector2 _velocity;
         private bool _isPlaySimulate;
 
+        private void Awake()
+        {
+            StopDrawLine();
+        }
+
         public void StartDrawLine()
         {
             _isPlaySimulate = true;

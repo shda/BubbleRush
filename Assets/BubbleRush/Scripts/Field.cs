@@ -21,18 +21,7 @@ namespace BubbleRush.Scripts
         private FieldGenerator fieldGenerator = new();
         private readonly HashSet<Bubble> _bubbles = new();
         private int _lineCurrent;
-
-        private async void Awake()
-        {
-            await UniTask.DelayFrame(5);
-            UpdateAllNeighbors();
-            
-            await UniTask.DelayFrame(5);
-            
-            FindUnconnectedBubblesToRoot findUnconnectedAreas = new();
-            var bubbles = findUnconnectedAreas.FindUnconnectedBubbles(_bubbles);
-        }
-
+        
         public int GetRandomColorIndex()
         {
             return Random.Range(0, maxColorIndex);
@@ -59,14 +48,7 @@ namespace BubbleRush.Scripts
             await UniTask.DelayFrame(5);
             UpdateAllNeighbors();
         }
-
-        [Button]
-        public void FindAllUnconnectedBubbles()
-        {
-            FindUnconnectedBubblesToRoot findUnconnectedAreas = new();
-            var bubbles = findUnconnectedAreas.FindUnconnectedBubbles(_bubbles);
-        }
-
+        
         [Button]
         public void UpdateAllNeighbors()
         {
@@ -106,6 +88,7 @@ namespace BubbleRush.Scripts
 
             await UniTask.Delay(TimeSpan.FromSeconds(0.5f));
         }
+        
         
         public void CreateField(IEnumerable<int> bubblesColors)
         {
@@ -232,21 +215,26 @@ namespace BubbleRush.Scripts
             return new Vector2(x, y);
         }
 
-        public async UniTask CheckAndRemoveFullLinesAsync(Bubble projectile)
+        public async UniTask<int> RemoveEqualsColorsBubblesAsync(Bubble projectile)
         {
             projectile.UpdateNeighbors();
-            await animationRemoveBubbles.CheckAndRemoveFullLinesAsync(_bubbles, projectile, offsetToBubbles);
-            
-            await UniTask.DelayFrame(5);
-            UpdateAllNeighbors();
-            await animationRemoveBubbles.RemoveFreeBubblesAsync(_bubbles);
+            return await animationRemoveBubbles.RemoveEqualsColorsBubblesAsync(_bubbles, projectile, offsetToBubbles);
         }
 
-        public bool CheckInBubblesCrossEndLevel()
+        public async UniTask<int> RemoveFreeBubblesAsync()
         {
-            return false;
+            UpdateAllNeighbors();
+            return await animationRemoveBubbles.RemoveFreeBubblesAsync(_bubbles);
         }
-
+        
+        public async UniTask AnimationRemoveBubbles(Bubble[] bubbles)
+        {
+            foreach (var bubble in bubbles)
+            {
+                await animationRemoveBubbles.AnimationRemoveBubble(_bubbles, bubble);
+            }
+        }
+        
         public void ReturnBubbleToPool(Bubble projectile)
         {
             poolBubbles.Release(projectile);
@@ -273,5 +261,6 @@ namespace BubbleRush.Scripts
             Gizmos.DrawSphere(point2, 0.3f);
         }
 #endif
+        
     }
 }

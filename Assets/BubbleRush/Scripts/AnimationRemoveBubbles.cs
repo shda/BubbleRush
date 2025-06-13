@@ -11,57 +11,47 @@ namespace BubbleRush.Scripts
     {
         [SerializeField] private BubblesPool poolBubbles;
         
-        private readonly FindUnconnectedBubblesToRoot findUnconnectedAreas = new();
-        private readonly FindOneColorBubblesConnect findOneColorBubblesConnect = new();
-        public async UniTask CheckAndRemoveFullLinesAsync(HashSet<Bubble> bubbles , Bubble projectile , Vector2 offsetToBubbles)
+        private readonly FindUnconnectedBubblesToRoot _findUnconnectedAreas = new();
+        private readonly FindOneColorBubblesConnect _findOneColorBubblesConnect = new();
+        public async UniTask<int> RemoveEqualsColorsBubblesAsync(HashSet<Bubble> bubbles , Bubble projectile , Vector2 offsetToBubbles)
         {
             bubbles.Add(projectile);
+            var allBubble = _findOneColorBubblesConnect.FindOneColorBubblesToOne(projectile);
+            int countRemoved = 0;
             
-            var color = projectile.Color;
-            /*
-            HashSet<Bubble> queue = new() { projectile };
-            HashSet<Bubble> allBubble = new();
-
-            while (queue.Count > 0)
-            {
-                var first = queue.First();
-                queue.Remove(first);
-
-                var findObjects = Physics2D.OverlapCircleAll(first.transform.position, offsetToBubbles.x);
-                foreach (var findObject in findObjects)
-                {
-                    var bubble = findObject.GetComponent<Bubble>();
-                    if (!bubble)
-                        continue;
-                    if (allBubble.Contains(bubble))
-                        continue;
-
-                    if (bubble.Color == color)
-                    {
-                        queue.Add(bubble);
-                        allBubble.Add(bubble);
-                    }
-                }
-            }
-            */
-
-            var allBubble = findOneColorBubblesConnect.FindOneColorBubblesToOne(projectile);
-
             if (allBubble.Count >= 3)
             {
+                countRemoved = allBubble.Count;
                 foreach (var bubble in allBubble)
                 {
-                    await bubble.transform.DOScale(0, 0.03f);
-                    bubble.transform.localScale = Vector3.one;
-                    poolBubbles.Release(bubble);
-                    bubbles.Remove(bubble);
+                    await AnimationRemoveBubble(bubbles ,bubble);
                 }
             }
+
+            return countRemoved;
+        }
+
+        public async UniTask AnimationRemoveBubble(HashSet<Bubble> bubbles , Bubble bubble)
+        {
+            await bubble.transform.DOScale(0, 0.1f);
+            bubble.transform.localScale = Vector3.one;
+            try
+            {
+                poolBubbles.Release(bubble);
+            }
+            catch (Exception e)
+            {
+                Debug.Log(e);
+            }
+            bubbles.Remove(bubble);
+            bubble.RemoveNeighbors();
         }
         
-        public async UniTask RemoveFreeBubblesAsync(HashSet<Bubble> allBubbles)
+        public async UniTask<int> RemoveFreeBubblesAsync(HashSet<Bubble> allBubbles)
         {
-            var bubbles = findUnconnectedAreas.FindUnconnectedBubbles(allBubbles);
+            var bubbles = _findUnconnectedAreas.FindUnconnectedBubbles(allBubbles);
+            var  countRemoved = bubbles.Count();
+            
             HashSet<Bubble> bubblesHash = new();
             foreach (var bubble in bubbles)
             {
@@ -70,20 +60,10 @@ namespace BubbleRush.Scripts
 
             foreach (var bubble in bubblesHash)
             {
-                await bubble.transform.DOScale(0, 0.03f);
-                bubble.transform.localScale = Vector3.one;
-                try
-                {
-                    allBubbles.Remove(bubble);
-                    poolBubbles.Release(bubble);
-                }
-                catch (Exception e)
-                {
-                    Debug.LogException(e);
-                }
-
-                bubble.RemoveNeighbors();
+                await AnimationRemoveBubble(allBubbles ,bubble);
             }
+
+            return countRemoved;
         }
     }
 }

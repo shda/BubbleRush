@@ -24,7 +24,7 @@ namespace BubbleRush.Scripts
 
         private void Awake()
         {
-            bubbleRay.StopDrawLine();
+           // bubbleRay.StopDrawLine();
         }
 
         public async UniTask AnimatedSetNextBubbleAsync(Bubble bubble)
@@ -35,7 +35,7 @@ namespace BubbleRush.Scripts
             _currentBubble = bubble;
             bubble.CollisionEnter2D = CollisionEnter2D;
             
-            bubbleRay.StartDrawLine();
+           // bubbleRay.StartDrawLine();
         }
         
         private void CollisionEnter2D(Collision2D collision, Bubble bubble)
@@ -48,7 +48,7 @@ namespace BubbleRush.Scripts
             if(!_currentBubble)
                 return;
             
-            bubbleRay.StopDrawLine();
+           // bubbleRay.StopDrawLine();
             
             _currentBubble.transform.SetParent(null);
             _currentBubble.SetDynamic();

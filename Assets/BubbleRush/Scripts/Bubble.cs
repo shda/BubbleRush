@@ -29,14 +29,17 @@ namespace BubbleRush.Scripts
         
         private Vector2 _linearVelocity;
         private Vector2 _offsetToBubbles;
+        
+        public Vector2 GetOffsetToBubbles()
+        {
+            return _offsetToBubbles;
+        }
 
         public void SetColorIndex(int bubbleColor)
         {
             Color = bubbleColor;
             spriteRenderer.sprite = sprites[bubbleColor];
         }
-        
-
         public void SetStatic()
         {
             body.bodyType = RigidbodyType2D.Static;

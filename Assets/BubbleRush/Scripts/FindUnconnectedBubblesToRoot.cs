@@ -11,7 +11,7 @@ namespace BubbleRush.Scripts
 
         public IEnumerable<Bubble> FindUnconnectedBubbles(HashSet<Bubble> allBubbles)
         {
-            return allBubbles.Where(bubble => !CheckBubbleToConnectRoot(bubble)).ToList();
+            return allBubbles.Where(bubble => !CheckBubbleToConnectRoot(bubble));
         }
 
         private bool CheckBubbleToConnectRoot(Bubble bubble)
