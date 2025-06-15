@@ -1,8 +1,10 @@
 using System;
 using BubbleRush.Scripts.Bonuses;
+using BubbleRush.Scripts.Settings;
 using Cysharp.Threading.Tasks;
 using DG.Tweening;
 using UnityEngine;
+using Zenject;
 
 namespace BubbleRush.Scripts
 {
@@ -10,17 +12,20 @@ namespace BubbleRush.Scripts
     {
         [SerializeField] private Transform rootRotate;
         [SerializeField] private Transform rootBubble;
-       // [SerializeField] private BubblesPool poolBubbles;
         [SerializeField] private BubbleRay bubbleRay;
         
-        [SerializeField] private Vector2 minMaxAngle;
-        [SerializeField] private float speedBubbleMove = 1.0f;
-        
         private Bubble _currentBubble;
+        private GameSettings _settings;
         
         public Vector3 PointToTarget { get; set; }
-        
         public Action<Collision2D , Bubble >  OnBubbleCollisionEnter2D;
+        
+        [Inject]
+        public void Initialize(GameSettings settings)
+        {
+            Debug.Log("Initialize");
+            _settings = settings;
+        }
         
         public async UniTask AnimatedSetNextBubbleAsync(Bubble bubble)
         {
@@ -43,7 +48,7 @@ namespace BubbleRush.Scripts
             
             _currentBubble.transform.SetParent(null);
             _currentBubble.SetDynamic();
-            _currentBubble.SetLinearVelocity(rootRotate.right * speedBubbleMove);
+            _currentBubble.SetLinearVelocity(rootRotate.right * _settings.SpeedBubbleMove);
             _currentBubble = null;
         }
         
@@ -59,13 +64,13 @@ namespace BubbleRush.Scripts
             
             Vector2 direction = mousePosition - rootRotate.position;
             var angle = Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg;
-            angle = Mathf.Clamp(angle, minMaxAngle.x, minMaxAngle.y);
+            angle = Mathf.Clamp(angle, _settings.MinMaxAngleCannon.x, _settings.MinMaxAngleCannon.y);
             
-            if (minMaxAngle.x < angle && angle < minMaxAngle.y)
+            if (_settings.MinMaxAngleCannon.x < angle && angle < _settings.MinMaxAngleCannon.y)
             {
                 rootRotate.rotation = Quaternion.AngleAxis(angle, Vector3.forward);
                 
-                bubbleRay.SetVelocity(direction.normalized * speedBubbleMove);
+                bubbleRay.SetVelocity(direction.normalized * _settings.SpeedBubbleMove);
             }
         }
     }

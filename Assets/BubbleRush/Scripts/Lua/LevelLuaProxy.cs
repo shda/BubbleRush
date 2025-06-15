@@ -2,6 +2,7 @@ using System;
 using System.Linq;
 using Lua;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 namespace BubbleRush.Scripts.Lua
 {
@@ -9,17 +10,17 @@ namespace BubbleRush.Scripts.Lua
     [LuaObject]
     public partial class LevelLuaProxy
     {
-        [SerializeField] private Field field;
+        [FormerlySerializedAs("field")] [SerializeField] private GameField gameField;
 
         [LuaMember]
         private void CreateMap(LuaTable stringsMap)
         {
             return;
-            field.ClearField();
+            gameField.ClearField();
             foreach (var str in stringsMap)
             {
                 var values = str.Value.ToString();
-                field.CreateField(values.Select(c => int.Parse(c.ToString())));
+                gameField.CreateField(values.Select(c => int.Parse(c.ToString())));
             }
         }
     }

@@ -6,18 +6,19 @@ using System.Threading.Tasks;
 using Cysharp.Threading.Tasks;
 using DG.Tweening;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 namespace BubbleRush.Scripts.Bonuses
 {
     public class BonusExplosion : BonusBase
     {
-        [SerializeField] private Field field;
+        [FormerlySerializedAs("field")] [SerializeField] private GameField gameField;
         [SerializeField] private GameStats stats;
 
         public override async UniTask<bool> CompleteShotBubbleOnTarget(Bubble bubble)
         {
             var bubbles = FindBubbles(bubble);
-            await field.AnimationRemoveBubbles(bubbles);
+            await gameField.AnimationRemoveBubbles(bubbles);
             
             ScoreChangeTools.RemoveExplosionBonus(stats , bubbles.Length);
             

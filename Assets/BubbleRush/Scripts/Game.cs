@@ -1,11 +1,8 @@
-using System;
 using BubbleRush.Scripts.Bonuses;
 using BubbleRush.Scripts.GameUi;
 using BubbleRush.Scripts.Lua;
 using Cysharp.Threading.Tasks;
-using UniRx;
 using UnityEngine;
-using UnityEngine.Serialization;
 using Random = UnityEngine.Random;
 
 namespace BubbleRush.Scripts
@@ -15,7 +12,7 @@ namespace BubbleRush.Scripts
         [SerializeField] private LuaScriptLoader luaScriptLoader;
         [SerializeField] private Cannon cannon;
         [SerializeField] private BubbleSpawner bubbleSpawner;
-        [SerializeField] private Field field;
+        [SerializeField] private GameField gameField;
         [SerializeField] private TriggerLineCrossedObjects triggerLineCrossedObjects;
         [SerializeField] private InputController inputController;
         [SerializeField] private BonusController bonusController;
@@ -72,7 +69,7 @@ namespace BubbleRush.Scripts
                     projectile.SetStatic();
                     projectile.CollisionEnter2D = null;
                     
-                    field.ReturnBubbleToPool(projectile);
+                    gameField.ReturnBubbleToPool(projectile);
                     
                     await AnimationCreateNewBubble(projectile.Color);
                     return;
@@ -85,7 +82,7 @@ namespace BubbleRush.Scripts
                 projectile.SetStatic();
                 projectile.CollisionEnter2D = null;
                 await UniTask.Yield();
-                field.FindAndInsertBubbleToFreePoint(projectile);
+                gameField.FindAndInsertBubbleToFreePoint(projectile);
                 await UniTask.Yield();
                 
                 await CompleteMovingBubble(projectile);
@@ -97,17 +94,17 @@ namespace BubbleRush.Scripts
             if (!await bonusController.CompleteShotBubbleOnTarget(projectile))
             {
                 var allBubbles = 0;
-                var countRemoveEqualsColors = await field.RemoveEqualsColorsBubblesAsync(projectile);
+                var countRemoveEqualsColors = await gameField.RemoveEqualsColorsBubblesAsync(projectile);
                 ScoreChangeTools.RemoveEqualsColors(gameStats , countRemoveEqualsColors);
                 
-                var countRemoveFreeBubbles  = await field.RemoveFreeBubblesAsync();
+                var countRemoveFreeBubbles  = await gameField.RemoveFreeBubblesAsync();
                 ScoreChangeTools.RemoveFreeBubbles(gameStats , countRemoveFreeBubbles);
                 
                 allBubbles += countRemoveEqualsColors + countRemoveFreeBubbles;
                 
                 if (await AddNewLineIfNeed())
                 {
-                    countRemoveFreeBubbles = await field.RemoveFreeBubblesAsync();
+                    countRemoveFreeBubbles = await gameField.RemoveFreeBubblesAsync();
                     allBubbles += countRemoveFreeBubbles;
                     ScoreChangeTools.RemoveFreeBubbles(gameStats , countRemoveFreeBubbles);
                 }
@@ -141,7 +138,7 @@ namespace BubbleRush.Scripts
             if(_currentShot >= addLineAfterShots)
             {
                 _currentShot = 0;
-                await field.AddNewLineAsync();
+                await gameField.AddNewLineAsync();
                 return true;
             }
 
@@ -151,7 +148,7 @@ namespace BubbleRush.Scripts
         private async UniTask CheckToGameOverAsync()
         {
             var crossCount = triggerLineCrossedObjects.CheckOverlappingObjects2D();
-            if(crossCount.Length > 1 || field.CheckIsGameOver())
+            if(crossCount.Length > 1 || gameField.CheckIsGameOver())
             {
                 gameOverMenu.gameObject.SetActive(true);
             }
@@ -162,10 +159,10 @@ namespace BubbleRush.Scripts
             await UniTask.Yield();
             await cannon.AnimatedSetNextBubbleAsync(bubbleSpawner.CurrentBubble);
             
-            var nextColorIndex = field.GetRandomColorIndex();
+            var nextColorIndex = gameField.GetRandomColorIndex();
             while (nextColorIndex == lastColor)
             {
-                nextColorIndex = field.GetRandomColorIndex();
+                nextColorIndex = gameField.GetRandomColorIndex();
             }
             bubbleSpawner.SetNextBubble(nextColorIndex);
         }

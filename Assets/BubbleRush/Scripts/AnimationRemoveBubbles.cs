@@ -4,16 +4,16 @@ using System.Linq;
 using Cysharp.Threading.Tasks;
 using DG.Tweening;
 using UnityEngine;
+using Zenject;
 
 namespace BubbleRush.Scripts
 {
     public class AnimationRemoveBubbles : MonoBehaviour
     {
-        [SerializeField] private BubblesPool poolBubbles;
-        
         private readonly FindUnconnectedBubblesToRoot _findUnconnectedAreas = new();
         private readonly FindOneColorBubblesConnect _findOneColorBubblesConnect = new();
-        public async UniTask<int> RemoveEqualsColorsBubblesAsync(HashSet<Bubble> bubbles , Bubble projectile , Vector2 offsetToBubbles)
+        
+        public async UniTask<int> RemoveEqualsColorsBubblesAsync(HashSet<Bubble> bubbles , Bubble projectile)
         {
             bubbles.Add(projectile);
             var allBubble = _findOneColorBubblesConnect.FindOneColorBubblesToOne(projectile);
@@ -37,7 +37,7 @@ namespace BubbleRush.Scripts
             bubble.transform.localScale = Vector3.one;
             try
             {
-                poolBubbles.Release(bubble);
+                bubble.ReturnToPool();
             }
             catch (Exception e)
             {

@@ -1,14 +1,14 @@
 using System;
-using System.Buffers;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Cysharp.Threading.Tasks;
 using DG.Tweening;
 using UnityEngine;
+using Zenject;
 
 namespace BubbleRush.Scripts
 {
-    public class Bubble : MonoBehaviour
+    public class Bubble : MonoBehaviour , IPoolable<IMemoryPool>
     {
         [SerializeField] private Rigidbody2D body;
         [SerializeField] private SpriteRenderer spriteRenderer;
@@ -32,6 +32,7 @@ namespace BubbleRush.Scripts
         
         private Vector2 _linearVelocity;
         private Vector2 _offsetToBubbles;
+        private IMemoryPool _memoryPool;
         
         public Vector2 GetOffsetToBubbles()
         {
@@ -97,7 +98,7 @@ namespace BubbleRush.Scripts
         {
             Neighbors.Clear();
             
-            var colliders = ArrayPool<Collider2D>.Shared.Rent(10);
+            var colliders = System.Buffers.ArrayPool<Collider2D>.Shared.Rent(10);
             var size = Physics2D.OverlapCircleNonAlloc(transform.position, _offsetToBubbles.x, colliders);
             for (int i = 0; i < size; i++)
             {
@@ -111,8 +112,8 @@ namespace BubbleRush.Scripts
                     bubble.Neighbors.Add(this);
                 } 
             }
-            
-            ArrayPool<Collider2D>.Shared.Return(colliders);
+
+            System.Buffers.ArrayPool<Collider2D>.Shared.Return(colliders);
         }
         
         public async UniTask AnimationHideBubbleAsync()
@@ -141,5 +142,19 @@ namespace BubbleRush.Scripts
             }
         }
 #endif
+        public void OnDespawned()
+        {
+            
+        }
+
+        public void OnSpawned(IMemoryPool memoryPool)
+        {
+            _memoryPool = memoryPool;
+        }
+
+        public void ReturnToPool()
+        {
+            _memoryPool.Despawn(this);
+        }
     }
 }

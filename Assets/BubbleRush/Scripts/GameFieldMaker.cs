@@ -5,7 +5,7 @@ using UnityEngine;
 
 namespace BubbleRush.Scripts
 {
-    public class FieldGenerator
+    public class GameFieldMaker : IGameFieldMaker
     {
         public int[,] GenerateField(int maxX, int maxY, int maxColorIndex)
         {

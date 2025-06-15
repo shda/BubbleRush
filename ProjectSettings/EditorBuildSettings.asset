@@ -6,6 +6,9 @@ EditorBuildSettings:
   serializedVersion: 2
   m_Scenes:
   - enabled: 1
+    path: Assets/BubbleRush/Scenes/MainMenu.unity
+    guid: 1ffcd8564e3af484ba12bae0c887b5bd
+  - enabled: 1
     path: Assets/BubbleRush/Scenes/BubbleRush.unity
     guid: f20001208b24b5e4b8d6899f7e391e65
   m_configObjects:
