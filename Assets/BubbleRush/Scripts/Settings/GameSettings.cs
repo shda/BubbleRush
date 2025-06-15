@@ -13,5 +13,8 @@ namespace BubbleRush.Scripts.Settings
         [field:Header("Cannon settings")] 
         [field:SerializeField] public Vector2 MinMaxAngleCannon { get; set; } = new(40,140);
         [field:SerializeField] public float SpeedBubbleMove { get; set; } = 1.0f;
+        
+        [field:Header("Game settings")] 
+        [field:SerializeField] public int CountShotsAddLine { get; set; } = 5;
     }
 }

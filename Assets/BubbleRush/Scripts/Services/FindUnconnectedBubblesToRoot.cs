@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using System.Linq;
 
-namespace BubbleRush.Scripts
+namespace BubbleRush.Scripts.Services
 {
     public class FindUnconnectedBubblesToRoot
     {

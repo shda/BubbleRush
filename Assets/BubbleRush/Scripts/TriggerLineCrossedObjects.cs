@@ -10,7 +10,7 @@ namespace BubbleRush.Scripts
     {
         [SerializeField] private BoxCollider2D _boxCollider2D;
         
-        public Collider2D[] CheckOverlappingObjects2D()
+        public Collider2D[] GetOverlappingObjects2D()
         {
             var center = (Vector2)transform.position + _boxCollider2D.offset;
             var size = _boxCollider2D.size;
@@ -29,7 +29,7 @@ namespace BubbleRush.Scripts
         public GameObject[] overlappingObjects;
         private void Update()
         {
-            overlappingObjects = CheckOverlappingObjects2D().Select(x => x.gameObject).ToArray();
+            overlappingObjects = GetOverlappingObjects2D().Select(x => x.gameObject).ToArray();
         }
 #endif
     }

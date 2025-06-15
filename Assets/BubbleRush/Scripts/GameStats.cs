@@ -3,8 +3,7 @@ using UnityEngine;
 
 namespace BubbleRush.Scripts
 {
-    [CreateAssetMenu(menuName = "Create GameStats", fileName = "GameStats", order = 0)]
-    public class GameStats : ScriptableObject
+    public class GameStats
     {
         public IntReactiveProperty BestScore { get;set; } = new();
         public IntReactiveProperty Score { get;set; } = new();
@@ -28,8 +27,8 @@ namespace BubbleRush.Scripts
             if(Score.Value > BestScore.Value)
             {
                 BestScore.Value = Score.Value;
+                PlayerPrefs.SetInt(nameof(BestScore), BestScore.Value);
             }
-            PlayerPrefs.SetInt(nameof(BestScore), BestScore.Value);
         }
     }
 }

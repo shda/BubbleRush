@@ -9,7 +9,6 @@ namespace BubbleRush.Scripts.GameUi
         
         public bool OnPress()
         {
-            Debug.Log(gameObject.name + " pressed");
             OnPressButton?.Invoke(this);
             return true;
         }

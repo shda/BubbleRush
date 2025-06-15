@@ -1,3 +1,4 @@
+using BubbleRush.Scripts.Services;
 using BubbleRush.Scripts.Settings;
 using UnityEngine;
 using Zenject;
@@ -8,11 +9,16 @@ namespace BubbleRush.Scripts.Installers
     {
         [SerializeField] private GameSettings gameSettings;
         [SerializeField] private Bubble bubblePrefab;
+        [SerializeField] private Camera mainCamera;
         public override void InstallBindings()
         {
             BindSettings();
             BindBubbleFactory();
+            
+            Container.BindInstance(mainCamera);
 
+            Container.Bind<BubblesAnimationService>().AsSingle();
+            Container.BindInterfacesAndSelfTo<InputService>().AsSingle();
             Container.Bind<IGameFieldMaker>().To<GameFieldMaker>().AsSingle();
         }
 

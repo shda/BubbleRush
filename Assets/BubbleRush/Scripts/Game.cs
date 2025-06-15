@@ -1,44 +1,60 @@
 using BubbleRush.Scripts.Bonuses;
 using BubbleRush.Scripts.GameUi;
-using BubbleRush.Scripts.Lua;
+using BubbleRush.Scripts.Services;
+using BubbleRush.Scripts.Settings;
 using Cysharp.Threading.Tasks;
 using UnityEngine;
+using Zenject;
 using Random = UnityEngine.Random;
 
 namespace BubbleRush.Scripts
 {
     public class Game : MonoBehaviour
     {
-        [SerializeField] private LuaScriptLoader luaScriptLoader;
         [SerializeField] private Cannon cannon;
         [SerializeField] private BubbleSpawner bubbleSpawner;
         [SerializeField] private GameField gameField;
         [SerializeField] private TriggerLineCrossedObjects triggerLineCrossedObjects;
-        [SerializeField] private InputController inputController;
         [SerializeField] private BonusController bonusController;
-        [SerializeField] private GameStats gameStats;
         [SerializeField] private GameOverMenu gameOverMenu;
-        [SerializeField] private int addLineAfterShots = 5;
-
+        
         private int _currentShot;
 
+        private GameStats _gameStats;
+        private IInputService _inputService;
+        private Camera _camera;
+        private GameSettings _gameSettings;
+
+        [Inject]
+        private void Initialize(
+            GameSettings gameSettings,
+            GameStats gameStats , 
+            IInputService inputService ,
+            Camera camera)
+        {
+            _gameSettings = gameSettings;
+            _camera = camera;
+            _inputService = inputService;
+            _gameStats = gameStats;
+        }
+        
         private void Awake()
         {
             gameOverMenu.gameObject.SetActive(false);
             
-            gameStats.Init();
-            gameStats.LoadValues();
+            _gameStats.Init();
+            _gameStats.LoadValues();
             
-            inputController.OnShot = () =>
+            _inputService.OnShotEvent = () =>
             {
                 _currentShot++;
                 bonusController.StartShot();
                 cannon.Shot();
             };
 
-            inputController.OnUpdateDirection = vec =>
+            _inputService.OnPointToScreen = vec =>
             {
-                cannon.PointToTarget = Camera.main.ScreenToWorldPoint(vec);
+                cannon.PointToTarget = _camera.ScreenToWorldPoint(vec);
             };
             
             cannon.OnBubbleCollisionEnter2D = CollisionEnter2D;
@@ -46,7 +62,6 @@ namespace BubbleRush.Scripts
 
         private void Start()
         {
-            luaScriptLoader.StartLevel();
             _currentShot = 0;
             
             bubbleSpawner.SetNextBubble(1);
@@ -55,12 +70,12 @@ namespace BubbleRush.Scripts
 
         private void CollisionEnter2D(Collision2D collision, Bubble projectile)
         {
-            CheckFieldIsCompleteAsync(collision , projectile).Forget();
+            OnBubbleCollision(collision , projectile).Forget();
         }
 
-        private async UniTask CheckFieldIsCompleteAsync(Collision2D collision, Bubble projectile)
+        private async UniTask OnBubbleCollision(Collision2D collision, Bubble projectile)
         {
-            var wall = collision.collider.GetComponent<Wall>();
+            var wall = collision.collider.GetComponent<WallColloder>();
             if (wall)
             {
                 if (wall.IsBubbleEnd)
@@ -70,7 +85,7 @@ namespace BubbleRush.Scripts
                     projectile.CollisionEnter2D = null;
                     
                     gameField.ReturnBubbleToPool(projectile);
-                    
+                    await AddNewLineIfNeedAsync();
                     await AnimationCreateNewBubble(projectile.Color);
                     return;
                 }
@@ -81,37 +96,34 @@ namespace BubbleRush.Scripts
             {
                 projectile.SetStatic();
                 projectile.CollisionEnter2D = null;
-                await UniTask.Yield();
                 gameField.FindAndInsertBubbleToFreePoint(projectile);
-                await UniTask.Yield();
-                
-                await CompleteMovingBubble(projectile);
+                await CompleteAddBubbleToField(projectile);
             }
         }
 
-        private async UniTask CompleteMovingBubble(Bubble projectile)
+        private async UniTask CompleteAddBubbleToField(Bubble projectile)
         {
             if (!await bonusController.CompleteShotBubbleOnTarget(projectile))
             {
                 var allBubbles = 0;
                 var countRemoveEqualsColors = await gameField.RemoveEqualsColorsBubblesAsync(projectile);
-                ScoreChangeTools.RemoveEqualsColors(gameStats , countRemoveEqualsColors);
+                ScoreChangeTools.RemoveEqualsColors(_gameStats , countRemoveEqualsColors);
                 
                 var countRemoveFreeBubbles  = await gameField.RemoveFreeBubblesAsync();
-                ScoreChangeTools.RemoveFreeBubbles(gameStats , countRemoveFreeBubbles);
+                ScoreChangeTools.RemoveFreeBubbles(_gameStats , countRemoveFreeBubbles);
                 
                 allBubbles += countRemoveEqualsColors + countRemoveFreeBubbles;
                 
-                if (await AddNewLineIfNeed())
+                if (await AddNewLineIfNeedAsync())
                 {
                     countRemoveFreeBubbles = await gameField.RemoveFreeBubblesAsync();
                     allBubbles += countRemoveFreeBubbles;
-                    ScoreChangeTools.RemoveFreeBubbles(gameStats , countRemoveFreeBubbles);
+                    ScoreChangeTools.RemoveFreeBubbles(_gameStats , countRemoveFreeBubbles);
                 }
 
                 AddBonusIfNeed(allBubbles);
                 
-                gameStats.SaveValues();
+                _gameStats.SaveValues();
                 await AnimationCreateNewBubble(projectile.Color);
                 await CheckToGameOverAsync();
             }
@@ -123,19 +135,18 @@ namespace BubbleRush.Scripts
             {
                 if (Random.Range(0, 100) > 50)
                 {
-                    gameStats.BonusExplosion.Value = true;
+                    _gameStats.BonusExplosion.Value = true;
                 }
                 else
                 {
-                    gameStats.BonusRay.Value = true;
+                    _gameStats.BonusRay.Value = true;
                 }
             }
         }
         
-        private async UniTask<bool> AddNewLineIfNeed()
+        private async UniTask<bool> AddNewLineIfNeedAsync()
         {
-            _currentShot++;
-            if(_currentShot >= addLineAfterShots)
+            if(_currentShot >= _gameSettings.CountShotsAddLine)
             {
                 _currentShot = 0;
                 await gameField.AddNewLineAsync();
@@ -147,7 +158,7 @@ namespace BubbleRush.Scripts
 
         private async UniTask CheckToGameOverAsync()
         {
-            var crossCount = triggerLineCrossedObjects.CheckOverlappingObjects2D();
+            var crossCount = triggerLineCrossedObjects.GetOverlappingObjects2D();
             if(crossCount.Length > 1 || gameField.CheckIsGameOver())
             {
                 gameOverMenu.gameObject.SetActive(true);

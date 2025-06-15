@@ -3,7 +3,7 @@ using UnityEngine;
 
 namespace BubbleRush.Scripts.Bonuses
 {
-    public class BubbleRay : MonoBehaviour
+    public class SimulationBubbleTrajectory : MonoBehaviour
     {
         [SerializeField] private BubbleSimulationBody bubbleSimulationBody;
         [SerializeField] private Transform rootRotate;

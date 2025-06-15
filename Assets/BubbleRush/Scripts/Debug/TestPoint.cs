@@ -1,7 +1,7 @@
 using System;
 using UnityEngine;
 
-namespace BubbleRush.Scripts
+namespace BubbleRush.Scripts.Debug
 {
     public class TestPoint : MonoBehaviour
     {

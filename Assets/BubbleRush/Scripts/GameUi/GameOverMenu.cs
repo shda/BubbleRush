@@ -1,17 +1,24 @@
 using TMPro;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using Zenject;
 
 namespace BubbleRush.Scripts.GameUi
 {
     public class GameOverMenu : MonoBehaviour
     {
         [SerializeField] private TextMeshProUGUI scoreText;
-        [SerializeField] private GameStats gameStats;
+        private GameStats _gameStats;
+
+        [Inject]
+        private void Initialize(GameStats gameStats)
+        {
+            _gameStats = gameStats;
+        }
 
         private void OnEnable()
         {
-            scoreText.text = gameStats.Score.Value.ToString();
+            scoreText.text = _gameStats.Score.Value.ToString();
         }
 
         public void OnPressRestart()

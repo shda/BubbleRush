@@ -773,7 +773,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   rootRotate: {fileID: 328265194}
   rootBubble: {fileID: 1749520125}
-  bubbleRay: {fileID: 584800999}
+  simulationBubbleTrajectory: {fileID: 584800999}
 --- !u!1 &338147532
 GameObject:
   m_ObjectHideFlags: 0
@@ -1021,6 +1021,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   gameSettings: {fileID: 11400000, guid: 6bbee6304c42da943bc833fcc6127efb, type: 2}
   bubblePrefab: {fileID: 3751374423826080950, guid: f5272740959e643478726b37e1dab18c, type: 3}
+  mainCamera: {fileID: 249047511}
 --- !u!114 &379233270
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1253,7 +1254,7 @@ GameObject:
   - component: {fileID: 421863838}
   - component: {fileID: 421863839}
   m_Layer: 0
-  m_Name: Ui
+  m_Name: Buttons
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1288,7 +1289,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b65297bba5d34faaa1637f7e62a8c620, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  gameStats: {fileID: 11400000, guid: d8ee84fb51466f64487d932b075ab132, type: 2}
   buttonRay: {fileID: 723238912}
   buttonExplosion: {fileID: 1625597759}
   bonusController: {fileID: 953740069}
@@ -1426,7 +1426,7 @@ GameObject:
   - component: {fileID: 584800996}
   - component: {fileID: 584800998}
   m_Layer: 0
-  m_Name: BonusDrawLine
+  m_Name: SimulationBubbleTrajectory
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1855,9 +1855,6 @@ GameObject:
   m_Component:
   - component: {fileID: 707980769}
   - component: {fileID: 707980771}
-  - component: {fileID: 707980770}
-  - component: {fileID: 707980772}
-  - component: {fileID: 707980773}
   m_Layer: 0
   m_Name: Game
   m_TagString: Untagged
@@ -1889,21 +1886,6 @@ Transform:
   - {fileID: 953740070}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &707980770
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 707980768}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 63c39d744bcf46a28f6168024553a9ac, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  luaAsset: {fileID: -6979533126094156877, guid: 4b489f2d96e557949b4e4ee6a56b2f76, type: 3}
-  levelLuaProxy:
-    gameField: {fileID: 2084171261}
 --- !u!114 &707980771
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1916,42 +1898,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 67eea15ab6a34bdbb1a3b0f25c1bb234, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  luaScriptLoader: {fileID: 707980770}
   cannon: {fileID: 335721102}
   bubbleSpawner: {fileID: 1743358497}
   gameField: {fileID: 2084171261}
   triggerLineCrossedObjects: {fileID: 669781416}
-  inputController: {fileID: 707980773}
   bonusController: {fileID: 953740069}
-  gameStats: {fileID: 11400000, guid: d8ee84fb51466f64487d932b075ab132, type: 2}
   gameOverMenu: {fileID: 1753690162}
-  addLineAfterShots: 5
---- !u!114 &707980772
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 707980768}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 38bbfa20309b4fe48437936ea810f321, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  prefab: {fileID: 3751374423826080950, guid: f5272740959e643478726b37e1dab18c, type: 3}
-  initialPoolSize: 100
---- !u!114 &707980773
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 707980768}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 3c21f70395f7439f8e6d7410a149c310, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!1 &723238909
 GameObject:
   m_ObjectHideFlags: 0
@@ -2699,8 +2651,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 70bc43ae877241f19cdefd20c19e8a7b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  bubbleRay: {fileID: 584800999}
-  maxCountShots: 5
+  simulationBubbleTrajectory: {fileID: 584800999}
+  disableRayAfterShots: 5
 --- !u!1 &1076468765
 GameObject:
   m_ObjectHideFlags: 0
@@ -2735,9 +2687,9 @@ RectTransform:
   m_Father: {fileID: 1753690161}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
-  m_AnchorMax: {x: 1, y: 1}
+  m_AnchorMax: {x: 0, y: 0}
   m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 0, y: 86.38501}
+  m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0.5, y: 0}
 --- !u!114 &1076468767
 MonoBehaviour:
@@ -3180,7 +3132,6 @@ GameObject:
   - component: {fileID: 1317013810}
   - component: {fileID: 1317013813}
   - component: {fileID: 1317013812}
-  - component: {fileID: 1317013811}
   - component: {fileID: 1317013814}
   m_Layer: 0
   m_Name: Score
@@ -3208,20 +3159,6 @@ RectTransform:
   m_AnchoredPosition: {x: -1.312, y: -18.6}
   m_SizeDelta: {x: 3.2, y: 1.34}
   m_Pivot: {x: 0, y: 0.5}
---- !u!114 &1317013811
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1317013809}
-  m_Enabled: 0
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 3245ec927659c4140ac4f8d17403cc18, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  m_HorizontalFit: 2
-  m_VerticalFit: 0
 --- !u!114 &1317013812
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3374,7 +3311,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   scoreLabel: {fileID: 1317013812}
-  gameStats: {fileID: 11400000, guid: d8ee84fb51466f64487d932b075ab132, type: 2}
 --- !u!1001 &1485931665
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -3636,7 +3572,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!114 &1753690158
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3736,7 +3672,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   scoreText: {fileID: 1151418977}
-  gameStats: {fileID: 11400000, guid: d8ee84fb51466f64487d932b075ab132, type: 2}
 --- !u!1 &1773246883
 GameObject:
   m_ObjectHideFlags: 0
@@ -3854,7 +3789,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   gameField: {fileID: 2084171261}
-  stats: {fileID: 11400000, guid: d8ee84fb51466f64487d932b075ab132, type: 2}
 --- !u!4 &1961686800
 Transform:
   m_ObjectHideFlags: 0
@@ -3880,7 +3814,6 @@ GameObject:
   m_Component:
   - component: {fileID: 2084171260}
   - component: {fileID: 2084171261}
-  - component: {fileID: 2084171263}
   - component: {fileID: 2084171262}
   m_Layer: 0
   m_Name: Field
@@ -3917,7 +3850,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: befed7beeb6e44db862b16e8c6433544, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  animationRemoveBubbles: {fileID: 2084171263}
 --- !u!114 &2084171262
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3932,18 +3864,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   sizePoint: 0.3
   color: {r: 0.30980393, g: 0.7019608, b: 0.20392157, a: 1}
---- !u!114 &2084171263
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2084171259}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 0ffdb1ae09d04134a8bad2069e400d31, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!50 &2034517005393039784
 Rigidbody2D:
   serializedVersion: 5

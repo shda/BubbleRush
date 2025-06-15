@@ -17,7 +17,7 @@ namespace BubbleRush.Scripts.Bonuses
                 IsCollision = true;
             }
 
-            var wall = other.collider.GetComponent<Wall>();
+            var wall = other.collider.GetComponent<WallColloder>();
             if (wall && wall.IsBubbleEnd)
             {
                 IsCollision = true;

@@ -1,5 +1,6 @@
 using System;
 using BubbleRush.Scripts.Bonuses;
+using BubbleRush.Scripts.Services;
 using BubbleRush.Scripts.Settings;
 using Cysharp.Threading.Tasks;
 using DG.Tweening;
@@ -12,18 +13,17 @@ namespace BubbleRush.Scripts
     {
         [SerializeField] private Transform rootRotate;
         [SerializeField] private Transform rootBubble;
-        [SerializeField] private BubbleRay bubbleRay;
-        
-        private Bubble _currentBubble;
-        private GameSettings _settings;
+        [SerializeField] private SimulationBubbleTrajectory simulationBubbleTrajectory;
         
         public Vector3 PointToTarget { get; set; }
         public Action<Collision2D , Bubble >  OnBubbleCollisionEnter2D;
-        
+
+        private Bubble _currentBubble;
+        private GameSettings _settings;
+
         [Inject]
         public void Initialize(GameSettings settings)
         {
-            Debug.Log("Initialize");
             _settings = settings;
         }
         
@@ -69,8 +69,7 @@ namespace BubbleRush.Scripts
             if (_settings.MinMaxAngleCannon.x < angle && angle < _settings.MinMaxAngleCannon.y)
             {
                 rootRotate.rotation = Quaternion.AngleAxis(angle, Vector3.forward);
-                
-                bubbleRay.SetVelocity(direction.normalized * _settings.SpeedBubbleMove);
+                simulationBubbleTrajectory.SetVelocity(direction.normalized * _settings.SpeedBubbleMove);
             }
         }
     }

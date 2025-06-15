@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Threading.Tasks;
 using Cysharp.Threading.Tasks;
 using DG.Tweening;
 using UnityEngine;
@@ -69,12 +68,12 @@ namespace BubbleRush.Scripts
             _offsetToBubbles = offsetToBubbles;
         }
 
-        public void UpdateWorldPositon()
+        private void UpdateWorldPositon()
         {
-            transform.localPosition = GetMovingPoint(PositionInGrid);
+            transform.localPosition = ConvertLocalPointToWorld(PositionInGrid);
         }
 
-        public Vector3 GetMovingPoint(Vector2Int position)
+        public Vector3 ConvertLocalPointToWorld(Vector2Int position)
         {
             var point = new Vector3(position.x * _offsetToBubbles.x, position.y * -_offsetToBubbles.y);
             if (position.y % 2 != 0)
@@ -85,7 +84,7 @@ namespace BubbleRush.Scripts
             return point;
         }
         
-        public void RemoveNeighbors()
+        public void RemoveNeighborsRefs()
         {
             foreach (var neighbor in Neighbors)
             {
@@ -94,7 +93,7 @@ namespace BubbleRush.Scripts
             Neighbors.Clear();
         }
 
-        public void UpdateNeighbors()
+        public void RefreshNeighbors()
         {
             Neighbors.Clear();
             
@@ -120,6 +119,21 @@ namespace BubbleRush.Scripts
         {
             await transform.DOScale(0, 0.1f);
         }
+        
+        void IPoolable<IMemoryPool>.OnDespawned()
+        {
+            
+        }
+
+        void IPoolable<IMemoryPool>.OnSpawned(IMemoryPool memoryPool)
+        {
+            _memoryPool = memoryPool;
+        }
+
+        public void ReturnToPool()
+        {
+            _memoryPool.Despawn(this);
+        }
 
 #if UNITY_EDITOR
         void OnDrawGizmosSelected()
@@ -142,19 +156,6 @@ namespace BubbleRush.Scripts
             }
         }
 #endif
-        public void OnDespawned()
-        {
-            
-        }
-
-        public void OnSpawned(IMemoryPool memoryPool)
-        {
-            _memoryPool = memoryPool;
-        }
-
-        public void ReturnToPool()
-        {
-            _memoryPool.Despawn(this);
-        }
+        
     }
 }

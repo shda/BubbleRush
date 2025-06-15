@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using BubbleRush.Scripts.Services;
 using BubbleRush.Scripts.Settings;
 using Cysharp.Threading.Tasks;
 using DG.Tweening;
@@ -13,11 +14,10 @@ namespace BubbleRush.Scripts
 {
     public class GameField : MonoBehaviour
     {
-        [SerializeField] private AnimationRemoveBubbles animationRemoveBubbles;
-
         private BubblePool _bubblePool;
         private GameSettings _settings;
         private IGameFieldMaker _gameFieldMaker;
+        private BubblesAnimationService _bubblesAnimationService;
         
         private readonly HashSet<Bubble> _bubbles = new();
         private int _lineCurrent;
@@ -26,8 +26,10 @@ namespace BubbleRush.Scripts
         public void Initialize(
             GameSettings settings , 
             IGameFieldMaker generator , 
-            BubblePool bubblePool)
+            BubblePool bubblePool,
+            BubblesAnimationService bubblesAnimationService)
         {
+            _bubblesAnimationService = bubblesAnimationService;
             _bubblePool = bubblePool;
             _gameFieldMaker = generator;
             _settings = settings;
@@ -65,7 +67,7 @@ namespace BubbleRush.Scripts
         {
             foreach (var bubble in _bubbles)
             {
-                bubble.UpdateNeighbors();
+                bubble.RefreshNeighbors();
             }
         }
 
@@ -76,7 +78,7 @@ namespace BubbleRush.Scripts
             foreach (var bubble in _bubbles)
             {
                 var newPos = bubble.PositionInGrid + new Vector2Int(0, 1);
-                var pointMove = bubble.GetMovingPoint(newPos);
+                var pointMove = bubble.ConvertLocalPointToWorld(newPos);
                 bubble.transform.DOLocalMove(pointMove, 0.5f).onComplete = () => { bubble.PositionInGrid = newPos; };
             }
 
@@ -212,21 +214,21 @@ namespace BubbleRush.Scripts
 
         public async UniTask<int> RemoveEqualsColorsBubblesAsync(Bubble projectile)
         {
-            projectile.UpdateNeighbors();
-            return await animationRemoveBubbles.RemoveEqualsColorsBubblesAsync(_bubbles, projectile);
+            projectile.RefreshNeighbors();
+            return await _bubblesAnimationService.RemoveEqualsColorsBubblesAsync(_bubbles, projectile);
         }
 
         public async UniTask<int> RemoveFreeBubblesAsync()
         {
             UpdateAllNeighbors();
-            return await animationRemoveBubbles.RemoveFreeBubblesAsync(_bubbles);
+            return await _bubblesAnimationService.RemoveFreeBubblesAsync(_bubbles);
         }
 
         public async UniTask AnimationRemoveBubbles(Bubble[] bubbles)
         {
             foreach (var bubble in bubbles)
             {
-                await animationRemoveBubbles.AnimationRemoveBubble(_bubbles, bubble);
+                await _bubblesAnimationService.AnimationRemoveBubble(_bubbles, bubble);
             }
         }
 

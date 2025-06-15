@@ -20,9 +20,9 @@ namespace BubbleRush.Scripts.Bonuses
             _currentBonus.EnableBonus();
         }
 
-        private void OnCompleteBonus(BonusBase obj)
+        private void OnCompleteBonus(BonusBase bonus)
         {
-            obj.OnCompleteBonus = null;
+            bonus.OnCompleteBonus = null;
             _currentBonus?.DisableBonus();
             _currentBonus = null;
         }

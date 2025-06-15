@@ -5,31 +5,31 @@ namespace BubbleRush.Scripts.Bonuses
 {
     public class BonusRay : BonusBase
     {
-        [SerializeField] private BubbleRay bubbleRay;
-        [SerializeField] private int maxCountShots = 5;
+        [SerializeField] private SimulationBubbleTrajectory simulationBubbleTrajectory;
+        [SerializeField] private int disableRayAfterShots = 5;
         
         private int _currentShot;
             
         public override void EnableBonus()
         {
-            bubbleRay.StartDrawLine();
+            simulationBubbleTrajectory.StartDrawLine();
             _currentShot = 0;
         }
 
         public override void DisableBonus()
         {
-            bubbleRay.StopDrawLine();
+            simulationBubbleTrajectory.StopDrawLine();
         }
 
         public override async UniTask<bool> CompleteShotBubbleOnTarget(Bubble bubble)
         {
-            if (_currentShot < maxCountShots)
+            if (_currentShot < disableRayAfterShots)
             {
-                bubbleRay.StartDrawLine();
+                simulationBubbleTrajectory.StartDrawLine();
             }
             else
             {
-                bubbleRay.StopDrawLine();
+                simulationBubbleTrajectory.StopDrawLine();
                 OnCompleteBonus?.Invoke(this);
             }
             
@@ -39,7 +39,7 @@ namespace BubbleRush.Scripts.Bonuses
         public override void StartShot()
         {
             _currentShot++;
-            bubbleRay.StopDrawLine();
+            simulationBubbleTrajectory.StopDrawLine();
             base.StartShot();
         }
     }

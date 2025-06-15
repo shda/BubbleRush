@@ -2,13 +2,11 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Cysharp.Threading.Tasks;
-using DG.Tweening;
 using UnityEngine;
-using Zenject;
 
-namespace BubbleRush.Scripts
+namespace BubbleRush.Scripts.Services
 {
-    public class AnimationRemoveBubbles : MonoBehaviour
+    public class BubblesAnimationService
     {
         private readonly FindUnconnectedBubblesToRoot _findUnconnectedAreas = new();
         private readonly FindOneColorBubblesConnect _findOneColorBubblesConnect = new();
@@ -41,10 +39,10 @@ namespace BubbleRush.Scripts
             }
             catch (Exception e)
             {
-                Debug.Log(e);
+                UnityEngine.Debug.Log(e);
             }
             bubbles.Remove(bubble);
-            bubble.RemoveNeighbors();
+            bubble.RemoveNeighborsRefs();
         }
         
         public async UniTask<int> RemoveFreeBubblesAsync(HashSet<Bubble> allBubbles)

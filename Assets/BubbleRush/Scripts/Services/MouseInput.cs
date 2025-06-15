@@ -1,26 +1,27 @@
 using System;
+using BubbleRush.Scripts.GameUi;
 using UnityEngine;
 using UnityEngine.EventSystems;
+using Zenject;
 
-namespace BubbleRush.Scripts.GameUi
+namespace BubbleRush.Scripts.Services
 {
-    public class InputController : MonoBehaviour
+    public class InputService : IInputService , ITickable
     {
-        public Action OnShot;
-        public Action<Vector2> OnUpdateDirection;
-        
-        private void Update()
+        public Action<Vector2> OnPointToScreen { get; set; }
+        public Action OnShotEvent { get; set; }
+
+        void ITickable.Tick()
         {
             if (Input.GetMouseButtonDown(0) && !EventSystem.current.IsPointerOverGameObject())
             {
                 if (!RayCastToButton())
                 {
-                    Debug.Log("Shot");
-                    OnShot?.Invoke();
+                    OnShotEvent?.Invoke();
                 }
             }
             
-            OnUpdateDirection?.Invoke(Input.mousePosition);
+            OnPointToScreen?.Invoke(Input.mousePosition);
         }
 
         private bool RayCastToButton()

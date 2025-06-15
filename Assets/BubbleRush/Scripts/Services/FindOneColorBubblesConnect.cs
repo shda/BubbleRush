@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 
-namespace BubbleRush.Scripts
+namespace BubbleRush.Scripts.Services
 {
     public class FindOneColorBubblesConnect
     {
