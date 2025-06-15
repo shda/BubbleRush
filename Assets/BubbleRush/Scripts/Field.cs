@@ -119,21 +119,7 @@ namespace BubbleRush.Scripts
             bubble.transform.SetParent(transform);
             bubble.PositionInGrid = new Vector2Int(x, y);
         }
-
-        private void SetBubbleInfoAnimate(Bubble bubble, int x, int y, int colorIndex)
-        {
-            bubble.SetOffset(offsetToBubbles);
-            bubble.SetColorIndex(colorIndex);
-            bubble.SetStatic();
-            bubble.transform.SetParent(transform);
-
-            var pointMove = bubble.GetMovingPoint(new Vector2Int(x, y));
-            bubble.transform.DOLocalMove(pointMove, 0.5f).onComplete = () =>
-            {
-                bubble.PositionInGrid = new Vector2Int(x, y);
-            };
-        }
-
+        
         public void ClearField()
         {
             _lineCurrent = 0;
@@ -240,6 +226,11 @@ namespace BubbleRush.Scripts
             poolBubbles.Release(projectile);
             _bubbles.Remove(projectile);
         }
+        
+        public bool CheckIsGameOver()
+        {
+            return _bubbles.Count <= 0;
+        }
 
 #if UNITY_EDITOR
         void OnDrawGizmosSelected()
@@ -261,6 +252,5 @@ namespace BubbleRush.Scripts
             Gizmos.DrawSphere(point2, 0.3f);
         }
 #endif
-        
     }
 }

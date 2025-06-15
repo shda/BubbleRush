@@ -1,6 +1,9 @@
 using System;
 using System.Buffers;
 using System.Collections.Generic;
+using System.Threading.Tasks;
+using Cysharp.Threading.Tasks;
+using DG.Tweening;
 using UnityEngine;
 
 namespace BubbleRush.Scripts
@@ -111,6 +114,11 @@ namespace BubbleRush.Scripts
             
             ArrayPool<Collider2D>.Shared.Return(colliders);
         }
+        
+        public async UniTask AnimationHideBubbleAsync()
+        {
+            await transform.DOScale(0, 0.1f);
+        }
 
 #if UNITY_EDITOR
         void OnDrawGizmosSelected()
@@ -133,6 +141,5 @@ namespace BubbleRush.Scripts
             }
         }
 #endif
-        
     }
 }

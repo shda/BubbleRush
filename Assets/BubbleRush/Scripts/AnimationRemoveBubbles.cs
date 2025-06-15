@@ -33,7 +33,7 @@ namespace BubbleRush.Scripts
 
         public async UniTask AnimationRemoveBubble(HashSet<Bubble> bubbles , Bubble bubble)
         {
-            await bubble.transform.DOScale(0, 0.1f);
+            await bubble.AnimationHideBubbleAsync();
             bubble.transform.localScale = Vector3.one;
             try
             {

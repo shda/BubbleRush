@@ -20,12 +20,15 @@ namespace BubbleRush.Scripts
         [SerializeField] private InputController inputController;
         [SerializeField] private BonusController bonusController;
         [SerializeField] private GameStats gameStats;
+        [SerializeField] private GameOverMenu gameOverMenu;
         [SerializeField] private int addLineAfterShots = 5;
 
         private int _currentShot;
 
         private void Awake()
         {
+            gameOverMenu.gameObject.SetActive(false);
+            
             gameStats.Init();
             gameStats.LoadValues();
             
@@ -40,11 +43,12 @@ namespace BubbleRush.Scripts
             {
                 cannon.PointToTarget = Camera.main.ScreenToWorldPoint(vec);
             };
+            
+            cannon.OnBubbleCollisionEnter2D = CollisionEnter2D;
         }
 
         private void Start()
         {
-            cannon.OnCollisionEnter2D = CollisionEnter2D;
             luaScriptLoader.StartLevel();
             _currentShot = 0;
             
@@ -97,7 +101,7 @@ namespace BubbleRush.Scripts
                 ScoreChangeTools.RemoveEqualsColors(gameStats , countRemoveEqualsColors);
                 
                 var countRemoveFreeBubbles  = await field.RemoveFreeBubblesAsync();
-                ScoreChangeTools.RemoveEqualsColors(gameStats , countRemoveFreeBubbles);
+                ScoreChangeTools.RemoveFreeBubbles(gameStats , countRemoveFreeBubbles);
                 
                 allBubbles += countRemoveEqualsColors + countRemoveFreeBubbles;
                 
@@ -105,7 +109,7 @@ namespace BubbleRush.Scripts
                 {
                     countRemoveFreeBubbles = await field.RemoveFreeBubblesAsync();
                     allBubbles += countRemoveFreeBubbles;
-                    ScoreChangeTools.RemoveEqualsColors(gameStats , countRemoveFreeBubbles);
+                    ScoreChangeTools.RemoveFreeBubbles(gameStats , countRemoveFreeBubbles);
                 }
 
                 AddBonusIfNeed(allBubbles);
@@ -147,11 +151,9 @@ namespace BubbleRush.Scripts
         private async UniTask CheckToGameOverAsync()
         {
             var crossCount = triggerLineCrossedObjects.CheckOverlappingObjects2D();
-            if(crossCount.Length > 1)
+            if(crossCount.Length > 1 || field.CheckIsGameOver())
             {
-                // Game Over logic here
-                Debug.Log("Game Over! You crossed the end line.");
-                // Optionally, you can reset the game or show a game over screen.
+                gameOverMenu.gameObject.SetActive(true);
             }
         }
 

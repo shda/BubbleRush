@@ -10,7 +10,7 @@ namespace BubbleRush.Scripts
     {
         [SerializeField] private Transform rootRotate;
         [SerializeField] private Transform rootBubble;
-        [SerializeField] private BubblesPool poolBubbles;
+       // [SerializeField] private BubblesPool poolBubbles;
         [SerializeField] private BubbleRay bubbleRay;
         
         [SerializeField] private Vector2 minMaxAngle;
@@ -20,13 +20,8 @@ namespace BubbleRush.Scripts
         
         public Vector3 PointToTarget { get; set; }
         
-        public Action<Collision2D , Bubble >  OnCollisionEnter2D;
-
-        private void Awake()
-        {
-           // bubbleRay.StopDrawLine();
-        }
-
+        public Action<Collision2D , Bubble >  OnBubbleCollisionEnter2D;
+        
         public async UniTask AnimatedSetNextBubbleAsync(Bubble bubble)
         {
             await UniTask.Yield();
@@ -34,21 +29,17 @@ namespace BubbleRush.Scripts
             await bubble.transform.DOLocalMove(Vector3.zero, 0.5f);
             _currentBubble = bubble;
             bubble.CollisionEnter2D = CollisionEnter2D;
-            
-           // bubbleRay.StartDrawLine();
         }
         
         private void CollisionEnter2D(Collision2D collision, Bubble bubble)
         {
-            OnCollisionEnter2D?.Invoke(collision , bubble);
+            OnBubbleCollisionEnter2D?.Invoke(collision , bubble);
         }
 
         public void Shot()
         {
             if(!_currentBubble)
                 return;
-            
-           // bubbleRay.StopDrawLine();
             
             _currentBubble.transform.SetParent(null);
             _currentBubble.SetDynamic();

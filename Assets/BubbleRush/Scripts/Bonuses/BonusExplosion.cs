@@ -12,11 +12,15 @@ namespace BubbleRush.Scripts.Bonuses
     public class BonusExplosion : BonusBase
     {
         [SerializeField] private Field field;
+        [SerializeField] private GameStats stats;
 
         public override async UniTask<bool> CompleteShotBubbleOnTarget(Bubble bubble)
         {
             var bubbles = FindBubbles(bubble);
             await field.AnimationRemoveBubbles(bubbles);
+            
+            ScoreChangeTools.RemoveExplosionBonus(stats , bubbles.Length);
+            
             await UniTask.DelayFrame(5);
             OnCompleteBonus?.Invoke(this);
             return false;

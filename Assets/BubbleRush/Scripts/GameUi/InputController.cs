@@ -31,8 +31,6 @@ namespace BubbleRush.Scripts.GameUi
             {
                 foreach (var hit2D in hit)
                 {
-                //    Debug.Log(hit2D.transform.name);
-                
                     var ipress = hit2D.collider.GetComponent<IPress>();
                     if (ipress != null)
                     {
