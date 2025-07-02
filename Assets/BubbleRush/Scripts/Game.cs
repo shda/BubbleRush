@@ -75,7 +75,7 @@ namespace BubbleRush.Scripts
 
         private async UniTask OnBubbleCollision(Collision2D collision, Bubble projectile)
         {
-            var wall = collision.collider.GetComponent<WallColloder>();
+            var wall = collision.collider.GetComponent<WallCollider>();
             if (wall)
             {
                 if (wall.IsBubbleEnd)

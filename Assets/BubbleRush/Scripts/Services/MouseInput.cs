@@ -13,13 +13,28 @@ namespace BubbleRush.Scripts.Services
 
         void ITickable.Tick()
         {
-            if (Input.GetMouseButtonDown(0) && !EventSystem.current.IsPointerOverGameObject())
+            if (!EventSystem.current.IsPointerOverGameObject())
             {
-                if (!RayCastToButton())
+                if (Input.touchCount > 0)
                 {
-                    OnShotEvent?.Invoke();
+                    if (Input.GetTouch(0).phase == TouchPhase.Ended)
+                    {
+                        if (!RayCastToButton())
+                        {
+                            OnShotEvent?.Invoke();
+                        }
+                    }
+                }
+                else if (Input.GetMouseButtonDown(0))
+                {
+                    if (!RayCastToButton())
+                    {
+                        OnShotEvent?.Invoke();
+                    }
                 }
             }
+            
+            
             
             OnPointToScreen?.Invoke(Input.mousePosition);
         }
